@@ -104,6 +104,42 @@ add_filter('body_class', function ($classes) {
     return $classes;
 });
 
+/*
+ * اتجاه الصفحة (RTL/LTR) بيتبع لغة الموقع الأساسية بس، وبلجن K3D Shop API
+ * (المتحكم في تبديل اللغة عبر ?lang= وكوكيز k3d_lang) بيترجم المحتوى لكنه
+ * ملموسش اتجاه الصفحة خالص. من هنا بنقرأ نفس الكوكيز/الباراميتر ونظبط
+ * الاتجاه يدويًا بدل ما يفضل عربي دايمًا.
+ */
+function k3d_resolve_frontend_lang() {
+    if (!empty($_GET['lang'])) {
+        return sanitize_key(wp_unslash($_GET['lang']));
+    }
+    if (!empty($_COOKIE['k3d_lang'])) {
+        return sanitize_key(wp_unslash($_COOKIE['k3d_lang']));
+    }
+    return 'ar';
+}
+
+function k3d_is_rtl_lang($lang) {
+    return in_array($lang, ['ar', 'he'], true);
+}
+
+add_filter('language_attributes', function ($output) {
+    $dir = k3d_is_rtl_lang(k3d_resolve_frontend_lang()) ? 'rtl' : 'ltr';
+
+    if (preg_match('/dir="(rtl|ltr)"/', $output)) {
+        return preg_replace('/dir="(rtl|ltr)"/', 'dir="' . $dir . '"', $output);
+    }
+
+    return $output . ' dir="' . esc_attr($dir) . '"';
+});
+
+add_filter('body_class', function ($classes) {
+    $classes = array_diff($classes, ['rtl', 'ltr']);
+    $classes[] = k3d_is_rtl_lang(k3d_resolve_frontend_lang()) ? 'rtl' : 'ltr';
+    return $classes;
+});
+
 // رقم الواتساب اللي بيتحط بدل رقم الهاتف في الهيدر. عدّله هنا لو اتغيّر لاحقًا.
 define('K3D_SHOP_WHATSAPP_NUMBER', '972586050540');
 define('K3D_SHOP_WHATSAPP_DISPLAY', '+972 58 605 0540');
@@ -116,10 +152,27 @@ add_action('wp_head', function () {
     .header--seven .product-categories-btn {
         display: none !important;
     }
-    .header-search-form,
+    /* مسافة كفاية عشان النص متبقاش مختفية تحت زرار البحث (80px تقريبًا) */
     .header-search-form input.header-search-input {
-        direction: rtl;
-        text-align: right;
+        text-align: start;
+        padding-inline-end: 90px !important;
+        padding-inline-start: 16px !important;
+    }
+    /* منع قائمة الصفحات من النزول لسطرين، من غير ما نقطع أي قوائم فرعية منسدلة */
+    .wf_navbar-mainmenu {
+        flex-wrap: nowrap !important;
+    }
+    .wf_navbar-mainmenu > li {
+        margin: 0 1rem !important;
+        flex-shrink: 0;
+    }
+    .wf_navbar-mainmenu > li > a {
+        white-space: nowrap;
+    }
+    /* توسيط الشريط العلوي بعد إخفاء العناصر التانية فيه */
+    .wf_header-topbar {
+        justify-content: center !important;
+        text-align: center !important;
     }
     </style>
     <?php
@@ -130,16 +183,44 @@ add_action('wp_head', function () {
 add_action('wp_footer', function () {
     ?>
     <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        // 1) إخفاء "Powered by WP Fable"
+    // إخفاء "Powered by WP Fable" - رابط أو نص عادي، وبتكرر شغلها لو الفوتر
+    // اتحمّل متأخر (JS من الثيم بيضيفه بعد التحميل الأول)
+    function k3dHideWpFableCredit() {
         document.querySelectorAll('a[href*="wpfable.com"]').forEach(function (link) {
             var line = link.closest('p, div, span, li') || link;
             line.style.display = 'none';
         });
 
-        // 2) تعبئة مكان الودجت الفاضي في الشريط العلوي بعرض شحن
+        var walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+        var node;
+        while ((node = walker.nextNode())) {
+            if (/wp\s*fable/i.test(node.nodeValue)) {
+                var container = node.parentElement ? node.parentElement.closest('p, div, span, li, footer') : null;
+                if (container) {
+                    container.style.display = 'none';
+                }
+            }
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        // 1) إخفاء "Powered by WP Fable"
+        k3dHideWpFableCredit();
+        new MutationObserver(k3dHideWpFableCredit).observe(document.body, { childList: true, subtree: true });
+
+        // 2) تعبئة مكان الودجت الفاضي في الشريط العلوي بعرض شحن، وإخفاء أي حاجة تانية
+        // جنبه في نفس الشريط (النص الإنجليزي وأيقونات التواصل الاجتماعي)
         document.querySelectorAll('.wf_header-topbar .widget.widget_none').forEach(function (el) {
             el.innerHTML = '🚚 شحن مجاني للضفة فوق 300 شيكل، القدس فوق 400 شيكل، مناطق 48 فوق 500 شيكل';
+
+            var topbar = el.closest('.wf_header-topbar');
+            if (topbar) {
+                Array.prototype.forEach.call(topbar.children, function (child) {
+                    if (!child.contains(el)) {
+                        child.style.display = 'none';
+                    }
+                });
+            }
         });
 
         // 3) تحويل رقم الهاتف في الهيدر (بس) لرابط واتساب
