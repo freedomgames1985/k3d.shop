@@ -76,7 +76,17 @@ function k3d_home_render_products($ids) {
         echo '<span class="woocommerce-loop-product__title">' . esc_html($product->get_name()) . '</span>';
         echo '</a>';
         echo '<span class="price">' . wp_kses_post($product->get_price_html()) . '</span>';
-        echo '<a href="' . esc_url($product->add_to_cart_url()) . '" class="button add_to_cart_button" data-product_id="' . esc_attr($id) . '" data-quantity="1">أضف للسلة</a>';
+
+        if ($product->is_purchasable()) {
+            $classes = array_filter([
+                'button',
+                'product_type_' . $product->get_type(),
+                $product->is_in_stock() ? 'add_to_cart_button' : '',
+                $product->supports('ajax_add_to_cart') && $product->is_in_stock() ? 'ajax_add_to_cart' : '',
+            ]);
+            echo '<a href="' . esc_url($product->add_to_cart_url()) . '" class="' . esc_attr(implode(' ', $classes)) . '" data-product_id="' . esc_attr($id) . '" data-quantity="1">' . esc_html($product->add_to_cart_text()) . '</a>';
+        }
+
         echo '</li>';
     }
     echo '</ul>';
