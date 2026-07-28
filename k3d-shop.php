@@ -152,11 +152,16 @@ add_action('wp_head', function () {
     .header--seven .product-categories-btn {
         display: none !important;
     }
-    /* مسافة كفاية عشان النص متبقاش مختفية تحت زرار البحث (80px تقريبًا) */
+    /*
+     * زرار البحث دايمًا فعليًا على اليمين (right: 0 في الثيم)، لكن حقل
+     * الإدخال بيورث dir="rtl" من الصفحة، فـ padding-inline-end بيترجم
+     * لليسار مش لليمين. لازم padding-right فعلي (physical) عشان يقابل
+     * مكان الزرار الحقيقي، مش logical.
+     */
     .header-search-form input.header-search-input {
-        text-align: start;
-        padding-inline-end: 90px !important;
-        padding-inline-start: 16px !important;
+        text-align: right !important;
+        padding-right: 90px !important;
+        padding-left: 16px !important;
     }
     /* منع قائمة الصفحات من النزول لسطرين، من غير ما نقطع أي قوائم فرعية منسدلة */
     .wf_navbar-mainmenu {
