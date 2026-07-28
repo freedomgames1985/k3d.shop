@@ -56,7 +56,7 @@ function k3d_home_section_hero_banner(): void {
 	<?php
 }
 
-/** شريط سلايدر - من مجموعة slider، أكتر من عنصر بسحب أفقي. */
+/** شريط سلايدر - من مجموعة slider، عنصر واحد ظاهر بالتنقل التلقائي بينهم. */
 function k3d_home_section_slider(): void {
 	$items = k3d_content_blocks( 'slider' );
 
@@ -65,15 +65,24 @@ function k3d_home_section_slider(): void {
 	}
 	?>
 	<section class="container">
-		<div class="home-slider">
-			<?php foreach ( $items as $item ) : ?>
-				<a class="home-slider-item" href="<?php echo esc_url( k3d_content_block_link_url( $item ) ?: '#' ); ?>">
-					<?php if ( ! empty( $item['image_url'] ) ) : ?>
-						<img src="<?php echo esc_url( $item['image_url'] ); ?>" alt="<?php echo esc_attr( $item['title'] ?? '' ); ?>">
-					<?php endif; ?>
-					<?php if ( ! empty( $item['title'] ) ) : ?><span><?php echo esc_html( $item['title'] ); ?></span><?php endif; ?>
-				</a>
-			<?php endforeach; ?>
+		<div class="home-slider" data-k3d-slider data-autoplay="5000">
+			<div class="home-slider-track">
+				<?php foreach ( $items as $item ) : ?>
+					<a class="home-slider-item" href="<?php echo esc_url( k3d_content_block_link_url( $item ) ?: '#' ); ?>">
+						<?php if ( ! empty( $item['image_url'] ) ) : ?>
+							<img src="<?php echo esc_url( $item['image_url'] ); ?>" alt="<?php echo esc_attr( $item['title'] ?? '' ); ?>">
+						<?php endif; ?>
+						<?php if ( ! empty( $item['title'] ) ) : ?><span><?php echo esc_html( $item['title'] ); ?></span><?php endif; ?>
+					</a>
+				<?php endforeach; ?>
+			</div>
+			<?php if ( count( $items ) > 1 ) : ?>
+				<div class="home-slider-dots">
+					<?php foreach ( $items as $i => $item ) : ?>
+						<button type="button" class="<?php echo 0 === $i ? 'is-active' : ''; ?>" data-index="<?php echo esc_attr( (string) $i ); ?>" aria-label="<?php echo esc_attr( sprintf( __( 'سلايد %d', 'k3d-shop' ), $i + 1 ) ); ?>"></button>
+					<?php endforeach; ?>
+				</div>
+			<?php endif; ?>
 		</div>
 	</section>
 	<?php

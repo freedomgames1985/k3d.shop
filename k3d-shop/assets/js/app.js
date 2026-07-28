@@ -82,4 +82,58 @@
 	}
 
 	document.addEventListener( 'DOMContentLoaded', initAccountTabs );
+
+	function initHomeSliders() {
+		document.querySelectorAll( '[data-k3d-slider]' ).forEach( function ( slider ) {
+			var track = slider.querySelector( '.home-slider-track' );
+			var slides = slider.querySelectorAll( '.home-slider-item' );
+			var dots = slider.querySelectorAll( '.home-slider-dots button' );
+			var delay = parseInt( slider.dataset.autoplay, 10 ) || 5000;
+			var index = 0;
+			var timer = null;
+
+			if ( ! track || slides.length < 2 ) {
+				return;
+			}
+
+			function goTo( i ) {
+				index = ( i + slides.length ) % slides.length;
+				track.style.transform = 'translateX(' + ( index * 100 * ( isRtl() ? 1 : -1 ) ) + '%)';
+				dots.forEach( function ( d, di ) {
+					d.classList.toggle( 'is-active', di === index );
+				} );
+			}
+
+			function isRtl() {
+				return 'rtl' === document.documentElement.dir;
+			}
+
+			function start() {
+				stop();
+				timer = setInterval( function () { goTo( index + 1 ); }, delay );
+			}
+
+			function stop() {
+				if ( timer ) {
+					clearInterval( timer );
+					timer = null;
+				}
+			}
+
+			dots.forEach( function ( d ) {
+				d.addEventListener( 'click', function () {
+					goTo( parseInt( d.dataset.index, 10 ) || 0 );
+					start();
+				} );
+			} );
+
+			slider.addEventListener( 'mouseenter', stop );
+			slider.addEventListener( 'mouseleave', start );
+
+			goTo( 0 );
+			start();
+		} );
+	}
+
+	document.addEventListener( 'DOMContentLoaded', initHomeSliders );
 } )();
