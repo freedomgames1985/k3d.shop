@@ -136,4 +136,31 @@
 	}
 
 	document.addEventListener( 'DOMContentLoaded', initHomeSliders );
+
+	function initCompactHeaderOnScroll() {
+		var header = document.querySelector( 'header.site' );
+
+		if ( ! header ) {
+			return;
+		}
+
+		var threshold = 80;
+		var ticking = false;
+
+		function update() {
+			header.classList.toggle( 'is-compact', window.scrollY > threshold );
+			ticking = false;
+		}
+
+		window.addEventListener( 'scroll', function () {
+			if ( ! ticking ) {
+				window.requestAnimationFrame( update );
+				ticking = true;
+			}
+		}, { passive: true } );
+
+		update();
+	}
+
+	document.addEventListener( 'DOMContentLoaded', initCompactHeaderOnScroll );
 } )();

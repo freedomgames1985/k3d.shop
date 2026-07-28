@@ -160,7 +160,8 @@ html[dir="rtl"] .lang-select-wrap{ padding:4px 10px 4px 26px; }
 
 /* ---------- header ---------- */
 header.site{ background:var(--header-bg); color:var(--header-text); position:sticky; top:0; z-index:40; }
-.header-row{ display:flex; align-items:center; gap:28px; padding:18px 0; }
+.header-row{ display:flex; align-items:center; gap:28px; padding:18px 0; max-height:120px; opacity:1; overflow:hidden; transition:max-height .25s ease, opacity .2s ease, padding .25s ease; }
+header.site.is-compact .header-row{ max-height:0; opacity:0; padding-top:0; padding-bottom:0; pointer-events:none; }
 .logo{ display:flex; align-items:center; gap:10px; text-decoration:none; flex:0 0 auto; }
 .logo-image{ display:block !important; height:40px !important; width:auto !important; max-width:160px !important; object-fit:contain !important; }
 .logo-mark{
@@ -1013,7 +1014,7 @@ table.shop_table td{
 .cart_totals table{ width:100%; border-collapse:collapse; }
 .cart_totals table th{ text-align:start; font-weight:400; color:var(--text-muted); font-size:14px; padding:10px 0; }
 .cart_totals table td{ text-align:end; font-family:var(--font-mono); padding:10px 0; }
-.cart_totals .order-total th, .cart_totals .order-total td{ font-weight:700; font-size:16px; color:var(--text); border-top:1px solid var(--line); }
+.cart_totals .order-total th, .cart_totals .order-total td{ font-weight:700; font-size:18px; color:var(--text); border-top:1px solid var(--line); font-family:var(--font-body); }
 .wc-proceed-to-checkout a.checkout-button{
   display:block; text-align:center; width:100%;
   background:var(--clay-500); color:#fff9f6; border-radius:10px;
