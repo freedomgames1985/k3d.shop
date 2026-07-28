@@ -146,13 +146,15 @@ function k3d_home_section_categories(): void {
 				<a class="cat-card" href="<?php echo esc_url( get_term_link( $cat ) ); ?>">
 					<div class="icon">
 						<?php if ( $thumb_id ) : ?>
-							<?php echo wp_get_attachment_image( $thumb_id, [ 32, 32 ] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+							<?php echo wp_get_attachment_image( $thumb_id, [ 96, 96 ] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 						<?php else : ?>
 							<svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="14" r="6"/><path d="m9 9-2-6h10l-2 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
 						<?php endif; ?>
 					</div>
-					<h3><?php echo esc_html( $cat->name ); ?></h3>
-					<span><?php echo esc_html( sprintf( _n( '%d منتج', '%d منتج', $cat->count, 'k3d-shop' ), $cat->count ) ); ?></span>
+					<div class="cat-card-body">
+						<h3><?php echo esc_html( $cat->name ); ?></h3>
+						<span><?php echo esc_html( sprintf( _n( '%d منتج', '%d منتج', $cat->count, 'k3d-shop' ), $cat->count ) ); ?></span>
+					</div>
 				</a>
 			<?php endforeach; ?>
 		</div>

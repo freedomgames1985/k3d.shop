@@ -144,11 +144,19 @@
 			return;
 		}
 
-		var threshold = 80;
+		var enterThreshold = 120;
+		var exitThreshold = 40;
 		var ticking = false;
 
 		function update() {
-			header.classList.toggle( 'is-compact', window.scrollY > threshold );
+			var y = window.scrollY;
+
+			if ( y > enterThreshold ) {
+				header.classList.add( 'is-compact' );
+			} else if ( y < exitThreshold ) {
+				header.classList.remove( 'is-compact' );
+			}
+
 			ticking = false;
 		}
 
@@ -163,4 +171,48 @@
 	}
 
 	document.addEventListener( 'DOMContentLoaded', initCompactHeaderOnScroll );
+
+	function initRecentOrdersNotice() {
+		var el = document.getElementById( 'k3d-recent-orders' );
+
+		if ( ! el ) {
+			return;
+		}
+
+		var items;
+
+		try {
+			items = JSON.parse( el.dataset.items || '[]' );
+		} catch ( e ) {
+			items = [];
+		}
+
+		if ( ! items.length ) {
+			return;
+		}
+
+		var index = 0;
+		var card = document.createElement( 'div' );
+		card.className = 'k3d-recent-orders-card';
+		el.appendChild( card );
+
+		function showNext() {
+			card.innerHTML = '<span class="dot"></span><span></span>';
+			card.querySelector( 'span:last-child' ).textContent = items[ index % items.length ];
+			index++;
+
+			requestAnimationFrame( function () {
+				card.classList.add( 'is-visible' );
+			} );
+
+			setTimeout( function () {
+				card.classList.remove( 'is-visible' );
+				setTimeout( showNext, 6000 );
+			}, 5000 );
+		}
+
+		setTimeout( showNext, 4000 );
+	}
+
+	document.addEventListener( 'DOMContentLoaded', initRecentOrdersNotice );
 } )();

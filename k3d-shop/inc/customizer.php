@@ -33,12 +33,12 @@ add_action( 'customize_register', function ( WP_Customize_Manager $wp_customize 
 	] );
 
 	$wp_customize->add_setting( 'k3d_shipping_info_text', [
-		'default'           => __( "نطبع طلبك ونجهّزه للشحن خلال 1-2 يوم عمل من تأكيد الطلب.\nالتوصيل يستغرق 3-5 أيام عمل حسب المنطقة.\nشحن مجاني: الضفة فوق ₪300 · القدس فوق ₪400 · مناطق 48 فوق ₪500.", 'k3d-shop' ),
+		'default'           => __( 'نحن هنا لتقديم أفضل خدمة لكم ❤️', 'k3d-shop' ),
 		'sanitize_callback' => 'sanitize_textarea_field',
 	] );
 
 	$wp_customize->add_control( 'k3d_shipping_info_text', [
-		'label'   => __( 'نص تبويب "معلومات الشحن" في صفحة المنتج', 'k3d-shop' ),
+		'label'   => __( 'ملاحظة إضافية أسفل تبويب "معلومات الشحن" في صفحة المنتج', 'k3d-shop' ),
 		'section' => 'k3d_shop_shipping_info',
 		'type'    => 'textarea',
 	] );
@@ -49,5 +49,5 @@ function k3d_announcement_text(): string {
 }
 
 function k3d_shipping_info_text(): string {
-	return get_theme_mod( 'k3d_shipping_info_text', __( "نطبع طلبك ونجهّزه للشحن خلال 1-2 يوم عمل من تأكيد الطلب.\nالتوصيل يستغرق 3-5 أيام عمل حسب المنطقة.\nشحن مجاني: الضفة فوق ₪300 · القدس فوق ₪400 · مناطق 48 فوق ₪500.", 'k3d-shop' ) );
+	return get_theme_mod( 'k3d_shipping_info_text', __( 'نحن هنا لتقديم أفضل خدمة لكم ❤️', 'k3d-shop' ) );
 }
