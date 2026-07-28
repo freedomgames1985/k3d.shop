@@ -97,6 +97,29 @@ function k3d_render_slider_markup( array $items, string $extra_class = '' ): voi
 	<?php
 }
 
+/** خطوات "إزاي بيشتغل" - 4 خطوات ثابتة، بتظهر دايمًا في الصفحة الرئيسية. */
+function k3d_render_how_it_works(): void {
+	$steps = [
+		[ 'title' => __( 'ابعتلنا فكرتك', 'k3d-shop' ), 'desc' => __( 'عبر واتساب أو صفحة الطلب الخاص، بالتفاصيل والمقاسات.', 'k3d-shop' ) ],
+		[ 'title' => __( 'نجهز ملف الطباعة', 'k3d-shop' ), 'desc' => __( 'نراجع التصميم معاك ونظبطه لأعلى دقة طباعة.', 'k3d-shop' ) ],
+		[ 'title' => __( 'نطبع بدقة عالية', 'k3d-shop' ), 'desc' => __( 'طباعة تجسيمية طبقة بطبقة بدقة 0.1 مم.', 'k3d-shop' ) ],
+		[ 'title' => __( 'نوصلك للباب', 'k3d-shop' ), 'desc' => __( 'تغليف وتوصيل لكل المناطق خلال 3-5 أيام.', 'k3d-shop' ) ],
+	];
+	?>
+	<section class="container how-it-works">
+		<div class="how-it-works-grid">
+			<?php foreach ( $steps as $i => $step ) : ?>
+				<div class="how-it-works-step">
+					<span class="how-it-works-num mono"><?php echo esc_html( sprintf( '%02d', $i + 1 ) ); ?></span>
+					<h3><?php echo esc_html( $step['title'] ); ?></h3>
+					<p><?php echo esc_html( $step['desc'] ); ?></p>
+				</div>
+			<?php endforeach; ?>
+		</div>
+	</section>
+	<?php
+}
+
 /** فئات المنتجات الحقيقية (WooCommerce) - أول 4 فئات رئيسية. */
 function k3d_home_section_categories(): void {
 	$cats = get_terms( [

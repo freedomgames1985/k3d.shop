@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 $links = k3d_app_links();
 ?>
 
-<section class="container">
+<section class="container section-app-cta">
 	<div class="app-cta">
 		<div class="app-cta-text">
 			<span class="kicker"><?php esc_html_e( 'حمّل التطبيق', 'k3d-shop' ); ?></span>

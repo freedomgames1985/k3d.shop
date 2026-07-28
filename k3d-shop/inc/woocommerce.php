@@ -48,3 +48,16 @@ add_filter( 'woocommerce_product_single_add_to_cart_button_html', function ( $ht
 add_filter( 'loop_shop_per_page', function () {
 	return 9;
 }, 20 );
+
+// تبويب "معلومات الشحن" جنب الوصف في صفحة المنتج - نص قابل للتعديل من Customizer.
+add_filter( 'woocommerce_product_tabs', function ( array $tabs ): array {
+	$tabs['k3d_shipping_info'] = [
+		'title'    => __( 'معلومات الشحن', 'k3d-shop' ),
+		'priority' => 15,
+		'callback' => function (): void {
+			echo '<div class="k3d-shipping-info">' . wp_kses_post( wpautop( esc_html( k3d_shipping_info_text() ) ) ) . '</div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		},
+	];
+
+	return $tabs;
+} );

@@ -27,13 +27,16 @@ function k3d_render_logo(): void {
 	<?php
 }
 
-/** رقم الهاتف من إعدادات المتجر، كرابط واتساب - بيفضل LTR حتى جوا صفحة عربي/عبري. */
-function k3d_whatsapp_link(): void {
+/** رقم واتساب المتجر - من إعدادات الإضافة، أو رقم افتراضي لو لسه محدّش ظبطه. */
+function k3d_whatsapp_phone(): string {
 	$phone = preg_replace( '/[^0-9+]/', '', (string) ( k3d_app_links()['contact_us_call'] ?? k3d_store_settings()['phone'] ?? '' ) );
 
-	if ( '' === $phone ) {
-		return;
-	}
+	return '' !== $phone ? $phone : '+972586050540';
+}
+
+/** رقم الهاتف من إعدادات المتجر، كرابط واتساب - بيفضل LTR حتى جوا صفحة عربي/عبري. */
+function k3d_whatsapp_link(): void {
+	$phone = k3d_whatsapp_phone();
 
 	$digits_only = ltrim( str_replace( '+', '', $phone ), '0' );
 	?>
@@ -145,7 +148,21 @@ function k3d_product_card( WC_Product $product ): void {
 				);
 				?>
 			</div>
+			<?php k3d_product_whatsapp_link( $product ); ?>
 		</div>
 	</div>
+	<?php
+}
+
+/** رابط "استفسار عبر واتساب" - بيتحط تحت زرار السلة في كرت المنتج. */
+function k3d_product_whatsapp_link( WC_Product $product ): void {
+	$phone       = k3d_whatsapp_phone();
+	$digits_only = ltrim( str_replace( '+', '', $phone ), '0' );
+	$message     = sprintf( __( 'مرحبًا، عايز أستفسر عن: %s', 'k3d-shop' ), $product->get_name() );
+	?>
+	<a class="prod-whatsapp" href="https://wa.me/<?php echo esc_attr( $digits_only ); ?>?text=<?php echo esc_attr( rawurlencode( $message ) ); ?>" target="_blank" rel="noopener">
+		<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5.1-1.3A10 10 0 1 0 12 2Zm5.6 14.3c-.2.6-1.3 1.2-1.9 1.3-.5.1-1.1.1-1.8-.1-.4-.1-1-.3-1.7-.6-3-1.3-5-4.3-5.1-4.5-.2-.2-1.2-1.6-1.2-3s.7-2.1 1-2.4c.3-.3.6-.4.8-.4h.6c.2 0 .4 0 .6.5.2.6.7 1.9.8 2 .1.2.1.4 0 .6-.1.2-.1.3-.3.5l-.4.5c-.1.2-.3.4-.1.7.2.3.9 1.4 1.8 2.3 1.3 1.2 2.3 1.6 2.6 1.8.3.1.5.1.7-.1.2-.2.7-.8.9-1.1.2-.3.4-.2.6-.1l1.8.9c.2.1.4.2.5.3.1.2.1.9-.1 1.5Z"/></svg>
+		<?php esc_html_e( 'استفسار عبر واتساب', 'k3d-shop' ); ?>
+	</a>
 	<?php
 }

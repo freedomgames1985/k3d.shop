@@ -18,6 +18,7 @@ get_header();
 	<?php foreach ( k3d_home_layout() as $section_key ) : ?>
 		<?php k3d_render_home_section( $section_key ); ?>
 	<?php endforeach; ?>
+	<?php k3d_render_how_it_works(); ?>
 </main>
 
 <?php

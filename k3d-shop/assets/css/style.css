@@ -485,6 +485,18 @@ section{ padding:64px 0; }
 @media (max-width:640px){ .home-slider-item{ aspect-ratio:4/3; } }
 
 /* custom cta */
+.how-it-works-grid{ display:grid; grid-template-columns:repeat(4,1fr); border-top:1px solid var(--line); }
+.how-it-works-step{ padding:32px 28px; border-inline-start:1px dashed var(--line); }
+.how-it-works-step:first-child{ border-inline-start:none; }
+.how-it-works-num{ display:block; color:var(--accent); font-size:13px; margin-bottom:14px; }
+.how-it-works-step h3{ font-size:16.5px; margin-bottom:8px; }
+.how-it-works-step p{ font-size:13.5px; color:var(--text-muted); margin:0; }
+@media (max-width:820px){
+  .how-it-works-grid{ grid-template-columns:1fr 1fr; }
+  .how-it-works-step{ border-inline-start:none; border-top:1px dashed var(--line); }
+  .how-it-works-step:nth-child(-n+2){ border-top:none; }
+}
+
 .custom-cta{
   background:var(--ink-900);
   color:var(--paper-050);
@@ -1107,6 +1119,31 @@ table.shop_table td{
 .account-switch-link{ background:none; border:0; color:var(--accent); font-weight:600; cursor:pointer; font-family:var(--font-body); font-size:13px; padding:0; }
 
 /* app download cta */
+.section-app-cta{ margin-top:24px; }
+
+.prod-whatsapp{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  margin-top:8px;
+  padding:8px;
+  border-radius:8px;
+  background:#e9f8ee;
+  color:#1f8a3b;
+  font-size:12.5px;
+  font-weight:600;
+  text-decoration:none;
+}
+.prod-whatsapp svg{ width:14px; height:14px; }
+.prod-whatsapp:hover{ background:#dcf3e3; }
+@media (prefers-color-scheme:dark){
+  .prod-whatsapp{ background:rgba(37,211,102,0.12); color:#3ddc6c; }
+  .prod-whatsapp:hover{ background:rgba(37,211,102,0.2); }
+}
+
+.k3d-shipping-info{ font-size:14.5px; line-height:1.9; color:var(--text); white-space:pre-line; }
+
 .app-cta{
   background:var(--surface);
   border:1px solid var(--line);
