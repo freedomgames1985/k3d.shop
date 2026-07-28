@@ -162,7 +162,7 @@ html[dir="rtl"] .lang-select-wrap{ padding:4px 10px 4px 26px; }
 header.site{ background:var(--header-bg); color:var(--header-text); position:sticky; top:0; z-index:40; }
 .header-row{ display:flex; align-items:center; gap:28px; padding:18px 0; }
 .logo{ display:flex; align-items:center; gap:10px; text-decoration:none; flex:0 0 auto; }
-.logo-image{ display:block; height:40px; width:auto; max-width:160px; object-fit:contain; }
+.logo-image{ display:block !important; height:40px !important; width:auto !important; max-width:160px !important; object-fit:contain !important; }
 .logo-mark{
   width:46px;height:38px;
   background:var(--clay-500);
@@ -223,7 +223,7 @@ html[dir="rtl"] .search input{ padding:11px 16px 11px 46px; }
   border:1px solid rgba(255,255,255,0.12);
   cursor:pointer;
 }
-.icon-btn svg{ width:17px;height:17px; stroke:#fff; }
+.icon-btn svg{ width:17px !important; height:17px !important; stroke:#fff; }
 .icon-btn .badge{
   position:absolute;
   top:-6px;
