@@ -122,14 +122,16 @@ add_action('wp_head', function () {
         padding-inline-end: 90px !important;
         padding-inline-start: 16px !important;
     }
-    /* منع قائمة الصفحات من النزول لسطرين */
+    /* منع قائمة الصفحات من النزول لسطرين، من غير ما نقطع أي قوائم فرعية منسدلة */
     .wf_navbar-mainmenu {
         flex-wrap: nowrap !important;
-        white-space: nowrap;
-        overflow-x: auto;
     }
     .wf_navbar-mainmenu > li {
         margin: 0 1rem !important;
+        flex-shrink: 0;
+    }
+    .wf_navbar-mainmenu > li > a {
+        white-space: nowrap;
     }
     /* توسيط الشريط العلوي بعد إخفاء العناصر التانية فيه */
     .wf_header-topbar {
@@ -145,12 +147,30 @@ add_action('wp_head', function () {
 add_action('wp_footer', function () {
     ?>
     <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        // 1) إخفاء "Powered by WP Fable"
+    // إخفاء "Powered by WP Fable" - رابط أو نص عادي، وبتكرر شغلها لو الفوتر
+    // اتحمّل متأخر (JS من الثيم بيضيفه بعد التحميل الأول)
+    function k3dHideWpFableCredit() {
         document.querySelectorAll('a[href*="wpfable.com"]').forEach(function (link) {
             var line = link.closest('p, div, span, li') || link;
             line.style.display = 'none';
         });
+
+        var walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+        var node;
+        while ((node = walker.nextNode())) {
+            if (/wp\s*fable/i.test(node.nodeValue)) {
+                var container = node.parentElement ? node.parentElement.closest('p, div, span, li, footer') : null;
+                if (container) {
+                    container.style.display = 'none';
+                }
+            }
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        // 1) إخفاء "Powered by WP Fable"
+        k3dHideWpFableCredit();
+        new MutationObserver(k3dHideWpFableCredit).observe(document.body, { childList: true, subtree: true });
 
         // 2) تعبئة مكان الودجت الفاضي في الشريط العلوي بعرض شحن، وإخفاء أي حاجة تانية
         // جنبه في نفس الشريط (النص الإنجليزي وأيقونات التواصل الاجتماعي)
