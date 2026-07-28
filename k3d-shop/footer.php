@@ -47,14 +47,31 @@ $links = k3d_app_links();
 		</div>
 		<div>
 			<h4><?php esc_html_e( 'تسوّق', 'k3d-shop' ); ?></h4>
-			<?php
-			wp_nav_menu( [
-				'theme_location' => 'footer',
-				'container'      => false,
-				'items_wrap'     => '<ul>%3$s</ul>',
-				'fallback_cb'    => false,
-			] );
-			?>
+			<?php if ( has_nav_menu( 'footer' ) ) : ?>
+				<?php
+				wp_nav_menu( [
+					'theme_location' => 'footer',
+					'container'      => false,
+					'items_wrap'     => '<ul>%3$s</ul>',
+					'fallback_cb'    => false,
+				] );
+				?>
+			<?php else : ?>
+				<ul>
+					<?php
+					// مفيش قائمة "footer" متظبطة لسه من Appearance > Menus - بنعرض
+					// فئات المنتجات الحقيقية بدل عمود فاضي.
+					$footer_cats = get_terms( [ 'taxonomy' => 'product_cat', 'hide_empty' => true, 'parent' => 0, 'number' => 4 ] );
+					if ( ! is_wp_error( $footer_cats ) ) :
+						foreach ( $footer_cats as $fcat ) :
+							?>
+							<li><a href="<?php echo esc_url( get_term_link( $fcat ) ); ?>"><?php echo esc_html( $fcat->name ); ?></a></li>
+							<?php
+						endforeach;
+					endif;
+					?>
+				</ul>
+			<?php endif; ?>
 		</div>
 		<div>
 			<h4><?php esc_html_e( 'الشركة', 'k3d-shop' ); ?></h4>
@@ -74,7 +91,13 @@ $links = k3d_app_links();
 		<div>
 			<h4><?php esc_html_e( 'تواصل معنا', 'k3d-shop' ); ?></h4>
 			<ul>
-				<li><?php k3d_whatsapp_link(); ?></li>
+				<?php
+				$has_phone = '' !== trim( (string) ( $links['contact_us_call'] ?? '' ) )
+					|| '' !== trim( (string) ( k3d_store_settings()['phone'] ?? '' ) );
+				?>
+				<?php if ( $has_phone ) : ?>
+					<li><?php k3d_whatsapp_link(); ?></li>
+				<?php endif; ?>
 				<?php if ( ! empty( $links['contact_us_email'] ) ) : ?>
 					<li><a href="mailto:<?php echo esc_attr( $links['contact_us_email'] ); ?>" class="mono"><?php echo esc_html( $links['contact_us_email'] ); ?></a></li>
 				<?php endif; ?>
