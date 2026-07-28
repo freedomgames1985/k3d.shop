@@ -55,32 +55,41 @@ $k3d_shop_by_category = [
 ];
 
 /**
- * يعرض قائمة منتجات بنفس تنسيق كروت المتجر (يعتمد على k3d-shop.css).
+ * يعرض قائمة منتجات بكروت بسيطة ومستقلة عن قوالب الثيم، عشان تفضل
+ * منظمة ومظبوطة بغض النظر عن الثيم النشط.
  */
 function k3d_home_render_products($ids) {
     if (empty($ids) || !function_exists('wc_get_product')) {
         return;
     }
 
-    $query = new WP_Query([
-        'post_type'      => 'product',
-        'post__in'       => $ids,
-        'orderby'        => 'post__in',
-        'posts_per_page' => count($ids),
-    ]);
+    echo '<ul class="products k3d-home-products">';
+    foreach ($ids as $id) {
+        $product = wc_get_product($id);
+        if (!$product) {
+            continue;
+        }
 
-    if (!$query->have_posts()) {
-        wp_reset_postdata();
-        return;
-    }
+        echo '<li class="product">';
+        echo '<a href="' . esc_url(get_permalink($id)) . '">';
+        echo get_the_post_thumbnail($id, 'woocommerce_thumbnail');
+        echo '<span class="woocommerce-loop-product__title">' . esc_html($product->get_name()) . '</span>';
+        echo '</a>';
+        echo '<span class="price">' . wp_kses_post($product->get_price_html()) . '</span>';
 
-    woocommerce_product_loop_start();
-    while ($query->have_posts()) {
-        $query->the_post();
-        wc_get_template_part('content', 'product');
+        if ($product->is_purchasable()) {
+            $classes = array_filter([
+                'button',
+                'product_type_' . $product->get_type(),
+                $product->is_in_stock() ? 'add_to_cart_button' : '',
+                $product->supports('ajax_add_to_cart') && $product->is_in_stock() ? 'ajax_add_to_cart' : '',
+            ]);
+            echo '<a href="' . esc_url($product->add_to_cart_url()) . '" class="' . esc_attr(implode(' ', $classes)) . '" data-product_id="' . esc_attr($id) . '" data-quantity="1">' . esc_html($product->add_to_cart_text()) . '</a>';
+        }
+
+        echo '</li>';
     }
-    woocommerce_product_loop_end();
-    wp_reset_postdata();
+    echo '</ul>';
 }
 ?>
 
