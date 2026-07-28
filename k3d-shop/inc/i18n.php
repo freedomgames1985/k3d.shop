@@ -109,14 +109,8 @@ add_filter( 'body_class', function ( array $classes ): array {
 } );
 
 /**
- * StorefrontTranslation بتحقن قائمة لغة عايمة تلقائيًا في كل صفحة (fixed،
- * أعلى يمين) عبر wp_body_open - وإحنا كمان بنعرضها بأنفسنا في مكانها في
- * الشريط العلوي (k3d_render_language_switcher في header.php)، فبتتكرر
- * مرتين. بنلغي حقن الإضافة التلقائي عشان يفضل مكان واحد بس (اللي في
- * التصميم)، من غير ما نلمس كود الإضافة نفسها.
+ * StorefrontTranslation بتحقن قائمة لغة عايمة تلقائيًا في كل صفحة (fixed)
+ * عبر wp_body_open. القالب مبقاش بيعرض نسخته الخاصة في الشريط العلوي
+ * (شيلناها من header.php) عشان تفضل نسخة عايمة واحدة بس من الإضافة، بدل
+ * ما تتكرر.
  */
-add_action( 'wp_loaded', function (): void {
-	if ( class_exists( '\K3D\ShopAPI\Frontend\StorefrontTranslation' ) ) {
-		remove_action( 'wp_body_open', [ '\K3D\ShopAPI\Frontend\StorefrontTranslation', 'inject_header_switcher' ], 10 );
-	}
-} );

@@ -162,6 +162,7 @@ html[dir="rtl"] .lang-select-wrap{ padding:4px 10px 4px 26px; }
 header.site{ background:var(--header-bg); color:var(--header-text); position:sticky; top:0; z-index:40; }
 .header-row{ display:flex; align-items:center; gap:28px; padding:18px 0; }
 .logo{ display:flex; align-items:center; gap:10px; text-decoration:none; flex:0 0 auto; }
+.logo-image{ display:block; height:40px; width:auto; max-width:160px; object-fit:contain; }
 .logo-mark{
   width:46px;height:38px;
   background:var(--clay-500);

@@ -22,7 +22,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<div class="ticker-track mono"><?php echo esc_html( k3d_announcement_text() ); ?></div>
 		<div class="top-actions">
 			<?php k3d_whatsapp_link(); ?>
-			<?php k3d_render_language_switcher(); ?>
 		</div>
 	</div>
 </div>
