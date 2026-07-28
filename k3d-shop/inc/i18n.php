@@ -109,6 +109,49 @@ add_filter( 'body_class', function ( array $classes ): array {
 } );
 
 /**
+ * ترجمة نصوص الثيم الثابتة (القوائم، الأزرار، عناوين الصفحة الرئيسية،
+ * الفوتر...) - دي منفصلة تمامًا عن نظام ترجمة المحتوى بالـAI بتاع
+ * k3d-shop-api (اللي بيترجم بس عنوان/وصف المنتج والصفحة والتصنيف من
+ * الداتابيز عبر StorefrontTranslation)، لأن نصوص الثيم دي مكتوبة كـmsgid
+ * عربي داخل __()/_e() نفسها ومفيش لها "entity" في الإضافة تتترجم بيه.
+ * بنعتمد على قاموس ثابت (k3d_i18n_dictionary() في i18n-strings.php) بدل
+ * ملفات .mo عشان يفضل شغال فورًا من غير build step، وبيتفعّل بس في
+ * الواجهة (مش الأدمن) عشان لوحة التحكم تفضل زي ما هي.
+ */
+if ( ! is_admin() ) {
+	add_filter( 'gettext', function ( $translation, $text, $domain ) {
+		if ( 'k3d-shop' !== $domain ) {
+			return $translation;
+		}
+
+		return k3d_translate( (string) $text );
+	}, 10, 3 );
+
+	add_filter( 'gettext_with_context', function ( $translation, $text, $context, $domain ) {
+		if ( 'k3d-shop' !== $domain ) {
+			return $translation;
+		}
+
+		return k3d_translate( (string) $text );
+	}, 10, 4 );
+
+	add_filter( 'ngettext', function ( $translation, $single, $plural, $number, $domain ) {
+		if ( 'k3d-shop' !== $domain ) {
+			return $translation;
+		}
+
+		return k3d_translate( (string) $translation );
+	}, 10, 5 );
+
+	// عناوين عناصر القائمة (Appearance > Menus) نصوص مكتوبة في الداتابيز
+	// من الأدمن نفسه - مش هتتترجم زي msgid الثابتة، فبنجرب نلاقيها في نفس
+	// القاموس (لو مطابقة للنص الافتراضي)، وإلا بتفضل زي ما هي.
+	add_filter( 'nav_menu_item_title', function ( $title ) {
+		return k3d_translate( (string) $title );
+	} );
+}
+
+/**
  * StorefrontTranslation بتحقن قائمة لغة عايمة تلقائيًا في كل صفحة (fixed)
  * عبر wp_body_open. القالب مبقاش بيعرض نسخته الخاصة في الشريط العلوي
  * (شيلناها من header.php) عشان تفضل نسخة عايمة واحدة بس من الإضافة، بدل

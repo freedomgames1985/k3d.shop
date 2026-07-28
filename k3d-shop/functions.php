@@ -13,6 +13,7 @@ define( 'K3D_SHOP_THEME_DIR', get_template_directory() );
 define( 'K3D_SHOP_THEME_URI', get_template_directory_uri() );
 
 require K3D_SHOP_THEME_DIR . '/inc/k3d-integration.php';
+require K3D_SHOP_THEME_DIR . '/inc/i18n-strings.php';
 require K3D_SHOP_THEME_DIR . '/inc/i18n.php';
 require K3D_SHOP_THEME_DIR . '/inc/setup.php';
 require K3D_SHOP_THEME_DIR . '/inc/template-tags.php';
