@@ -112,8 +112,8 @@ define('K3D_SHOP_WHATSAPP_DISPLAY', '+972 58 605 0540');
 add_action('wp_head', function () {
     ?>
     <style>
-    .product-categories,
-    .product-categories-btn {
+    .header--seven .product-categories,
+    .header--seven .product-categories-btn {
         display: none !important;
     }
     .header-search-form,
@@ -142,8 +142,8 @@ add_action('wp_footer', function () {
             el.innerHTML = '🚚 شحن مجاني للضفة فوق 300 شيكل، القدس فوق 400 شيكل، مناطق 48 فوق 500 شيكل';
         });
 
-        // 3) تحويل رقم الهاتف في الهيدر لرابط واتساب
-        document.querySelectorAll('a[href^="tel:"]').forEach(function (link) {
+        // 3) تحويل رقم الهاتف في الهيدر (بس) لرابط واتساب
+        document.querySelectorAll('.wf_navbar-info-contact a[href^="tel:"]').forEach(function (link) {
             link.setAttribute('href', 'https://wa.me/<?php echo esc_js(K3D_SHOP_WHATSAPP_NUMBER); ?>');
             link.setAttribute('target', '_blank');
             link.setAttribute('rel', 'noopener');
