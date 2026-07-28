@@ -304,7 +304,7 @@ function k3d_home_product_row( string $kicker, string $title, array $query_args,
 	<section class="container">
 		<div class="section-head">
 			<div>
-				<span class="kicker"><?php echo esc_html( $kicker ); ?></span>
+				<?php if ( '' !== $kicker && $kicker !== $title ) : ?><span class="kicker"><?php echo esc_html( $kicker ); ?></span><?php endif; ?>
 				<h2><?php echo esc_html( $title ); ?></h2>
 			</div>
 			<?php if ( $view_all_url ) : ?>
