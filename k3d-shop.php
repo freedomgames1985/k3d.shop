@@ -116,10 +116,25 @@ add_action('wp_head', function () {
     .header--seven .product-categories-btn {
         display: none !important;
     }
-    .header-search-form,
+    /* مسافة كفاية عشان النص متبقاش مختفية تحت زرار البحث (80px تقريبًا) */
     .header-search-form input.header-search-input {
-        direction: rtl;
-        text-align: right;
+        text-align: start;
+        padding-inline-end: 90px !important;
+        padding-inline-start: 16px !important;
+    }
+    /* منع قائمة الصفحات من النزول لسطرين */
+    .wf_navbar-mainmenu {
+        flex-wrap: nowrap !important;
+        white-space: nowrap;
+        overflow-x: auto;
+    }
+    .wf_navbar-mainmenu > li {
+        margin: 0 1rem !important;
+    }
+    /* توسيط الشريط العلوي بعد إخفاء العناصر التانية فيه */
+    .wf_header-topbar {
+        justify-content: center !important;
+        text-align: center !important;
     }
     </style>
     <?php
@@ -137,9 +152,19 @@ add_action('wp_footer', function () {
             line.style.display = 'none';
         });
 
-        // 2) تعبئة مكان الودجت الفاضي في الشريط العلوي بعرض شحن
+        // 2) تعبئة مكان الودجت الفاضي في الشريط العلوي بعرض شحن، وإخفاء أي حاجة تانية
+        // جنبه في نفس الشريط (النص الإنجليزي وأيقونات التواصل الاجتماعي)
         document.querySelectorAll('.wf_header-topbar .widget.widget_none').forEach(function (el) {
             el.innerHTML = '🚚 شحن مجاني للضفة فوق 300 شيكل، القدس فوق 400 شيكل، مناطق 48 فوق 500 شيكل';
+
+            var topbar = el.closest('.wf_header-topbar');
+            if (topbar) {
+                Array.prototype.forEach.call(topbar.children, function (child) {
+                    if (!child.contains(el)) {
+                        child.style.display = 'none';
+                    }
+                });
+            }
         });
 
         // 3) تحويل رقم الهاتف في الهيدر (بس) لرابط واتساب
