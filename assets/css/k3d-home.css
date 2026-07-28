@@ -2,6 +2,44 @@
     overflow-x: hidden;
 }
 
+/* شبكة كروت المنتجات (مستقلة عن شبكة الثيم) */
+.k3d-home ul.products.k3d-home-products {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+@media (max-width: 992px) {
+    .k3d-home ul.products.k3d-home-products {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 680px) {
+    .k3d-home ul.products.k3d-home-products {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 420px) {
+    .k3d-home ul.products.k3d-home-products {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* إخفاء عنوان الصفحة/الفتات (breadcrumb) اللي بيضيفهم الثيم فوق المحتوى */
+body.k3d-home-page .wf_pagetitle,
+body.k3d-home-page .wf_breadcrumb,
+body.k3d-home-page .site-breadcrumb,
+body.k3d-home-page .woocommerce-breadcrumb,
+body.k3d-home-page .entry-header,
+body.k3d-home-page .page-title-wrapper {
+    display: none !important;
+}
+
 .k3d-home section {
     padding: 70px 20px;
 }

@@ -27,12 +27,19 @@ define('K3D_SHOP_ACCENT_COLOR', '#e0ad3e');       // ذهبي غامق - اسم 
 define('K3D_SHOP_SALE_COLOR', '#d92d20');         // أحمر - باج الخصم
 define('K3D_SHOP_NEW_COLOR', '#333333');          // رمادي غامق - باج "جديد"
 
-// تحميل تنسيقات كروت المنتجات وصفحة المنتج، فقط في صفحات ووكومرس
+/**
+ * الصفحة الحالية هي الصفحة الرئيسية المبنية بقالب K3D؟
+ */
+function k3d_is_home_template() {
+    return is_page() && 'k3d-home-template.php' === get_page_template_slug(get_queried_object_id());
+}
+
+// تحميل تنسيقات كروت المنتجات وصفحة المنتج، في صفحات ووكومرس وفي الصفحة الرئيسية
 add_action('wp_enqueue_scripts', function () {
-    if (!function_exists('is_woocommerce')) {
-        return;
-    }
-    if (!(is_shop() || is_product_category() || is_product_tag() || is_product())) {
+    $is_woo_page = function_exists('is_woocommerce')
+        && (is_shop() || is_product_category() || is_product_tag() || is_product());
+
+    if (!$is_woo_page && !k3d_is_home_template()) {
         return;
     }
 
@@ -70,7 +77,7 @@ add_filter('theme_page_templates', function ($templates) {
 });
 
 add_filter('template_include', function ($template) {
-    if (is_page() && 'k3d-home-template.php' === get_page_template_slug(get_queried_object_id())) {
+    if (k3d_is_home_template()) {
         $custom = plugin_dir_path(__FILE__) . 'templates/k3d-home-template.php';
         if (file_exists($custom)) {
             return $custom;
@@ -80,14 +87,36 @@ add_filter('template_include', function ($template) {
 });
 
 add_action('wp_enqueue_scripts', function () {
-    if (!is_page() || 'k3d-home-template.php' !== get_page_template_slug(get_queried_object_id())) {
+    if (!k3d_is_home_template()) {
         return;
     }
 
-    wp_enqueue_style('k3d-home-style', plugins_url('assets/css/k3d-home.css', __FILE__), [], '1.2.0');
-    wp_add_inline_style('k3d-home-style', k3d_shop_color_vars());
+    // k3d-shop-style بتديها شكل الكروت (بتتحمل فوق من نفس الفانكشن).
+    wp_enqueue_style('k3d-home-style', plugins_url('assets/css/k3d-home.css', __FILE__), ['k3d-shop-style'], '1.2.0');
     wp_enqueue_script('k3d-home-script', plugins_url('assets/js/k3d-home.js', __FILE__), [], '1.2.0', true);
+}, 20);
+
+// إضافة كلاس على الـ body للصفحة الرئيسية عشان نقدر نخفي عناصر الثيم (عنوان/فتات) بأمان
+add_filter('body_class', function ($classes) {
+    if (k3d_is_home_template()) {
+        $classes[] = 'k3d-home-page';
+    }
+    return $classes;
 });
+
+// إخفاء سطر "Powered by WP Fable" في تذييل الموقع، في كل الصفحات
+add_action('wp_footer', function () {
+    ?>
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('a[href*="wpfable.com"]').forEach(function (link) {
+            var line = link.closest('p, div, span, li') || link;
+            line.style.display = 'none';
+        });
+    });
+    </script>
+    <?php
+}, 100);
 
 /*
  * نموذج الاشتراك بالنشرة البريدية في الصفحة الرئيسية.
