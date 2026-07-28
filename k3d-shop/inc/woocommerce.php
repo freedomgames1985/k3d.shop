@@ -49,6 +49,61 @@ add_filter( 'loop_shop_per_page', function () {
 	return 9;
 }, 20 );
 
+/**
+ * وقت انتهاء العرض لمنتج عليه تخفيض - من تاريخ "نهاية العرض" الحقيقي في
+ * ووكومرس (Product data > عام > تاريخ انتهاء السعر) لو الأدمن حدده، وإلا
+ * أسبوع بيبدأ من أول ظهور للعرض. بيتخزن في الميتا عشان العد التنازلي
+ * يفضل ثابت مع كل تحميل للصفحة، ولو انتهى فعليًا بيتجدد تلقائيًا طول
+ * ما المنتج لسه عليه تخفيض (يعني لو الأدمن مدّ العرض من غير ما يحدد
+ * تاريخ، بيكمل عد أسبوع جديد بدل ما يفضل واقف على صفر).
+ */
+function k3d_sale_countdown_end( WC_Product $product ): ?int {
+	$to = $product->get_date_on_sale_to();
+
+	if ( $to instanceof WC_DateTime ) {
+		return $to->getTimestamp();
+	}
+
+	$stored = (int) $product->get_meta( '_k3d_sale_countdown_end' );
+
+	if ( $stored > time() ) {
+		return $stored;
+	}
+
+	$end = time() + WEEK_IN_SECONDS;
+	$product->update_meta_data( '_k3d_sale_countdown_end', $end );
+	$product->save_meta_data();
+
+	return $end;
+}
+
+// عد تنازلي تحت سعر المنتج في صفحة المنتج المفرد لو عليه تخفيض - عشان
+// يشجع على الشراء قبل ما ينتهي العرض.
+add_action( 'woocommerce_single_product_summary', function (): void {
+	global $product;
+
+	if ( ! $product instanceof WC_Product || ! $product->is_on_sale() ) {
+		return;
+	}
+
+	$end = k3d_sale_countdown_end( $product );
+
+	if ( ! $end || $end <= time() ) {
+		return;
+	}
+	?>
+	<div class="sale-countdown" data-k3d-countdown data-end="<?php echo esc_attr( (string) ( $end * 1000 ) ); ?>">
+		<span class="sale-countdown-label">⏳ <?php esc_html_e( 'ينتهي العرض خلال', 'k3d-shop' ); ?></span>
+		<div class="sale-countdown-clock mono">
+			<div class="sale-countdown-unit"><span data-unit="d">00</span><small><?php esc_html_e( 'يوم', 'k3d-shop' ); ?></small></div>
+			<div class="sale-countdown-unit"><span data-unit="h">00</span><small><?php esc_html_e( 'ساعة', 'k3d-shop' ); ?></small></div>
+			<div class="sale-countdown-unit"><span data-unit="m">00</span><small><?php esc_html_e( 'دقيقة', 'k3d-shop' ); ?></small></div>
+			<div class="sale-countdown-unit"><span data-unit="s">00</span><small><?php esc_html_e( 'ثانية', 'k3d-shop' ); ?></small></div>
+		</div>
+	</div>
+	<?php
+}, 15 );
+
 // تبويب "معلومات الشحن" جنب الوصف في صفحة المنتج.
 add_filter( 'woocommerce_product_tabs', function ( array $tabs ): array {
 	$tabs['k3d_shipping_info'] = [

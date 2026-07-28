@@ -45,7 +45,7 @@ $is_search = is_search();
 		</div>
 	</aside>
 
-	<div class="shop-main">
+	<div class="shop-main" data-k3d-infinite-scroll>
 		<?php if ( woocommerce_product_loop() ) : ?>
 
 			<div class="shop-toolbar">
@@ -67,6 +67,8 @@ $is_search = is_search();
 			<?php woocommerce_product_loop_end(); ?>
 
 			<div class="pagination"><?php woocommerce_pagination(); ?></div>
+			<div class="shop-infinite-loading" hidden><?php esc_html_e( 'جاري تحميل المزيد...', 'k3d-shop' ); ?></div>
+			<div class="shop-infinite-sentinel" aria-hidden="true"></div>
 
 		<?php else : ?>
 			<?php do_action( 'woocommerce_no_products_found' ); ?>

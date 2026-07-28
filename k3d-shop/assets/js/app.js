@@ -215,4 +215,167 @@
 	}
 
 	document.addEventListener( 'DOMContentLoaded', initRecentOrdersNotice );
+
+	// تحميل صفحات المتجر تلقائيًا عند النزول لآخر الصفحة، بدل الانتقال
+	// لصفحة تالية. بيعتمد على رابط "next" الحقيقي من ووكومرس (paginate_links)
+	// عشان يفضل متوافق مع أي فلتر/ترتيب مفعّل في الرابط.
+	function initShopInfiniteScroll() {
+		var main = document.querySelector( '[data-k3d-infinite-scroll]' );
+		var grid = main && main.querySelector( '.shop-grid' );
+		var sentinel = main && main.querySelector( '.shop-infinite-sentinel' );
+		var loading = main && main.querySelector( '.shop-infinite-loading' );
+		var pagination = main && main.querySelector( '.pagination' );
+
+		if ( ! main || ! grid || ! sentinel || ! pagination || ! window.IntersectionObserver ) {
+			return;
+		}
+
+		var nextLink = pagination.querySelector( 'a.next' );
+
+		if ( ! nextLink ) {
+			sentinel.remove();
+			return;
+		}
+
+		pagination.hidden = true;
+
+		var busy = false;
+		var observer = new IntersectionObserver( function ( entries ) {
+			entries.forEach( function ( entry ) {
+				if ( entry.isIntersecting ) {
+					loadNext();
+				}
+			} );
+		}, { rootMargin: '600px 0px' } );
+
+		function stop() {
+			nextLink = null;
+			observer.disconnect();
+			sentinel.remove();
+		}
+
+		function loadNext() {
+			if ( busy || ! nextLink ) {
+				return;
+			}
+			busy = true;
+			loading.hidden = false;
+
+			fetch( nextLink.href )
+				.then( function ( res ) { return res.text(); } )
+				.then( function ( html ) {
+					var doc = new DOMParser().parseFromString( html, 'text/html' );
+					var newGrid = doc.querySelector( '.shop-grid' );
+					var newPagination = doc.querySelector( '.pagination' );
+
+					if ( newGrid ) {
+						Array.prototype.slice.call( newGrid.children ).forEach( function ( card ) {
+							grid.appendChild( card );
+						} );
+					}
+
+					nextLink = newPagination ? newPagination.querySelector( 'a.next' ) : null;
+
+					if ( ! nextLink ) {
+						stop();
+					}
+				} )
+				.catch( stop )
+				.then( function () {
+					busy = false;
+					loading.hidden = true;
+				} );
+		}
+
+		observer.observe( sentinel );
+	}
+
+	document.addEventListener( 'DOMContentLoaded', initShopInfiniteScroll );
+
+	// عد تنازلي حي لعروض التخفيض في صفحة المنتج - بيتحدث لوحده كل ثانية
+	// من غير أي تحديث للصفحة، وبيختفي لوحده لو العرض خلص.
+	function initSaleCountdown() {
+		document.querySelectorAll( '[data-k3d-countdown]' ).forEach( function ( el ) {
+			var end = parseInt( el.dataset.end, 10 );
+
+			if ( ! end ) {
+				return;
+			}
+
+			function pad( n ) {
+				n = String( n );
+				return n.length < 2 ? '0' + n : n;
+			}
+
+			function render() {
+				var diff = end - Date.now();
+
+				if ( diff <= 0 ) {
+					clearInterval( timer );
+					el.remove();
+					return;
+				}
+
+				var days = Math.floor( diff / 86400000 );
+				var hours = Math.floor( diff / 3600000 ) % 24;
+				var minutes = Math.floor( diff / 60000 ) % 60;
+				var seconds = Math.floor( diff / 1000 ) % 60;
+
+				[ [ 'd', days ], [ 'h', hours ], [ 'm', minutes ], [ 's', seconds ] ].forEach( function ( pair ) {
+					var unitEl = el.querySelector( '[data-unit="' + pair[ 0 ] + '"]' );
+					if ( unitEl ) {
+						unitEl.textContent = pad( pair[ 1 ] );
+					}
+				} );
+			}
+
+			render();
+			var timer = setInterval( render, 1000 );
+		} );
+	}
+
+	document.addEventListener( 'DOMContentLoaded', initSaleCountdown );
+
+	// تأثير ظهور تدريجي (fade + slide) للكروت والأقسام في الصفحة الرئيسية
+	// لما توصلهم أثناء الاسكرول، بترتيب متتابع بسيط بين عناصر نفس المجموعة.
+	function initScrollReveal() {
+		if ( ! window.IntersectionObserver ) {
+			return;
+		}
+
+		var targets = document.querySelectorAll(
+			'.section-head, .cat-card, .prod-card, .custom-cta, .how-it-works-step'
+		);
+
+		if ( ! targets.length ) {
+			return;
+		}
+
+		targets.forEach( function ( el ) { el.classList.add( 'k3d-reveal' ); } );
+
+		var counters = new WeakMap();
+
+		var observer = new IntersectionObserver( function ( entries ) {
+			entries.forEach( function ( entry ) {
+				if ( ! entry.isIntersecting ) {
+					return;
+				}
+
+				var el = entry.target;
+				var parent = el.parentElement;
+				var index = counters.get( parent ) || 0;
+				counters.set( parent, index + 1 );
+
+				setTimeout( function () {
+					el.classList.add( 'is-visible' );
+				}, Math.min( index, 6 ) * 70 );
+
+				observer.unobserve( el );
+			} );
+		}, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' } );
+
+		targets.forEach( function ( el ) { observer.observe( el ); } );
+	}
+
+	document.addEventListener( 'DOMContentLoaded', initScrollReveal );
 } )();
