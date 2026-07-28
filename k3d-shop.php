@@ -104,14 +104,57 @@ add_filter('body_class', function ($classes) {
     return $classes;
 });
 
-// إخفاء سطر "Powered by WP Fable" في تذييل الموقع، في كل الصفحات
+// رقم الواتساب اللي بيتحط بدل رقم الهاتف في الهيدر. عدّله هنا لو اتغيّر لاحقًا.
+define('K3D_SHOP_WHATSAPP_NUMBER', '972586050540');
+define('K3D_SHOP_WHATSAPP_DISPLAY', '+972 58 605 0540');
+
+// إخفاء زرار "تصفح التصنيفات" البرتقالي في الهيدر، في كل الصفحات
+add_action('wp_head', function () {
+    ?>
+    <style>
+    .product-categories,
+    .product-categories-btn {
+        display: none !important;
+    }
+    .header-search-form,
+    .header-search-form input.header-search-input {
+        direction: rtl;
+        text-align: right;
+    }
+    </style>
+    <?php
+}, 100);
+
+// إخفاء سطر "Powered by WP Fable"، وتعبئة مكان الودجت الفاضي في الشريط العلوي
+// بعرض شحن، وتحويل رقم الهاتف في الهيدر لرابط واتساب - في كل الصفحات
 add_action('wp_footer', function () {
     ?>
     <script>
     document.addEventListener('DOMContentLoaded', function () {
+        // 1) إخفاء "Powered by WP Fable"
         document.querySelectorAll('a[href*="wpfable.com"]').forEach(function (link) {
             var line = link.closest('p, div, span, li') || link;
             line.style.display = 'none';
+        });
+
+        // 2) تعبئة مكان الودجت الفاضي في الشريط العلوي بعرض شحن
+        document.querySelectorAll('.wf_header-topbar .widget.widget_none').forEach(function (el) {
+            el.innerHTML = '🚚 شحن مجاني للضفة فوق 300 شيكل، القدس فوق 400 شيكل، مناطق 48 فوق 500 شيكل';
+        });
+
+        // 3) تحويل رقم الهاتف في الهيدر لرابط واتساب
+        document.querySelectorAll('a[href^="tel:"]').forEach(function (link) {
+            link.setAttribute('href', 'https://wa.me/<?php echo esc_js(K3D_SHOP_WHATSAPP_NUMBER); ?>');
+            link.setAttribute('target', '_blank');
+            link.setAttribute('rel', 'noopener');
+
+            var walker = document.createTreeWalker(link, NodeFilter.SHOW_TEXT);
+            var node;
+            while ((node = walker.nextNode())) {
+                if (node.nodeValue.trim().length > 0) {
+                    node.nodeValue = '<?php echo esc_js(K3D_SHOP_WHATSAPP_DISPLAY); ?>';
+                }
+            }
         });
     });
     </script>
