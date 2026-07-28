@@ -104,6 +104,42 @@ add_filter('body_class', function ($classes) {
     return $classes;
 });
 
+/*
+ * اتجاه الصفحة (RTL/LTR) بيتبع لغة الموقع الأساسية بس، وبلجن K3D Shop API
+ * (المتحكم في تبديل اللغة عبر ?lang= وكوكيز k3d_lang) بيترجم المحتوى لكنه
+ * ملموسش اتجاه الصفحة خالص. من هنا بنقرأ نفس الكوكيز/الباراميتر ونظبط
+ * الاتجاه يدويًا بدل ما يفضل عربي دايمًا.
+ */
+function k3d_resolve_frontend_lang() {
+    if (!empty($_GET['lang'])) {
+        return sanitize_key(wp_unslash($_GET['lang']));
+    }
+    if (!empty($_COOKIE['k3d_lang'])) {
+        return sanitize_key(wp_unslash($_COOKIE['k3d_lang']));
+    }
+    return 'ar';
+}
+
+function k3d_is_rtl_lang($lang) {
+    return in_array($lang, ['ar', 'he'], true);
+}
+
+add_filter('language_attributes', function ($output) {
+    $dir = k3d_is_rtl_lang(k3d_resolve_frontend_lang()) ? 'rtl' : 'ltr';
+
+    if (preg_match('/dir="(rtl|ltr)"/', $output)) {
+        return preg_replace('/dir="(rtl|ltr)"/', 'dir="' . $dir . '"', $output);
+    }
+
+    return $output . ' dir="' . esc_attr($dir) . '"';
+});
+
+add_filter('body_class', function ($classes) {
+    $classes = array_diff($classes, ['rtl', 'ltr']);
+    $classes[] = k3d_is_rtl_lang(k3d_resolve_frontend_lang()) ? 'rtl' : 'ltr';
+    return $classes;
+});
+
 // رقم الواتساب اللي بيتحط بدل رقم الهاتف في الهيدر. عدّله هنا لو اتغيّر لاحقًا.
 define('K3D_SHOP_WHATSAPP_NUMBER', '972586050540');
 define('K3D_SHOP_WHATSAPP_DISPLAY', '+972 58 605 0540');
