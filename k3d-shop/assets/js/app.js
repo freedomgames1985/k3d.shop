@@ -339,7 +339,7 @@
 	// تأثير ظهور تدريجي (fade + slide) للكروت والأقسام في الصفحة الرئيسية
 	// لما توصلهم أثناء الاسكرول، بترتيب متتابع بسيط بين عناصر نفس المجموعة.
 	function initScrollReveal() {
-		if ( ! window.IntersectionObserver ) {
+		if ( ! window.IntersectionObserver || document.body.classList.contains( 'k3d-no-animations' ) ) {
 			return;
 		}
 

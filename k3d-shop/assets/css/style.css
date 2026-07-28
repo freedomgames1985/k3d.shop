@@ -378,6 +378,12 @@ section{ padding:64px 0; }
   .k3d-reveal{ opacity:1; transform:none; transition:none; }
   .medal-ring, .medal, .hero-inner > div:first-child > *, .hero-inner > *:last-child{ animation:none; opacity:1; transform:none; }
 }
+/* موقوفة من Customizer > تأثيرات الصفحة الرئيسية */
+body.k3d-no-animations .k3d-reveal{ opacity:1; transform:none; transition:none; }
+body.k3d-no-animations .medal-ring,
+body.k3d-no-animations .medal,
+body.k3d-no-animations .hero-inner > div:first-child > *,
+body.k3d-no-animations .hero-inner > *:last-child{ animation:none; opacity:1; transform:none; }
 
 /* categories */
 .cat-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:16px; }
@@ -451,8 +457,9 @@ section{ padding:64px 0; }
   border-radius:5px;
 }
 .prod-body{ padding:16px 16px 18px; display:flex; flex-direction:column; gap:10px; flex:1; }
-.prod-cat{ font-family:var(--font-mono); font-size:10.5px; color:var(--text-muted); text-transform:uppercase; letter-spacing:.06em; }
-.prod-name{ font-size:15px; font-weight:600; margin:0; }
+.prod-cat{ font-family:var(--font-mono); font-size:10.5px; color:var(--text-muted); text-transform:uppercase; letter-spacing:.06em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.prod-cat a{ text-decoration:none; color:inherit; }
+.prod-name{ font-size:15px; font-weight:600; margin:0; text-decoration:none; }
 .prod-foot{ margin-top:auto; display:flex; align-items:center; justify-content:space-between; gap:10px; }
 .prod-price{ font-family:var(--font-mono); font-weight:700; font-size:16px; color:var(--accent-strong); }
 .prod-add{
@@ -465,6 +472,32 @@ section{ padding:64px 0; }
   flex:0 0 auto;
 }
 .prod-add svg{ width:15px;height:15px; stroke:#fff; }
+
+@media (max-width:600px){
+  .prod-grid{ gap:12px; }
+  .prod-body{ padding:11px 11px 13px; gap:6px; }
+  .prod-cat{ font-size:9px; }
+  .prod-name{
+    font-size:12.5px;
+    line-height:1.35;
+    display:-webkit-box;
+    -webkit-line-clamp:2;
+    -webkit-box-orient:vertical;
+    overflow:hidden;
+  }
+  .prod-foot{ align-items:flex-end; }
+  .prod-price{
+    font-size:12px;
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    gap:1px;
+    line-height:1.3;
+  }
+  .prod-price del{ font-size:10px; opacity:.6; }
+  .prod-add{ width:27px;height:27px; border-radius:7px; }
+  .prod-add svg{ width:12px;height:12px; }
+}
 
 /* سلايدر الصفحة الرئيسية */
 .home-slider{ position:relative; border-radius:20px; overflow:hidden; }
@@ -1181,8 +1214,9 @@ table.shop_table td{
 
 .prod-whatsapp{
   display:flex;
-  align-items:center;
+  align-items:flex-start;
   justify-content:center;
+  text-align:center;
   gap:6px;
   margin-top:8px;
   padding:8px;
@@ -1191,13 +1225,18 @@ table.shop_table td{
   color:#1f8a3b;
   font-size:12.5px;
   font-weight:600;
+  line-height:1.3;
   text-decoration:none;
 }
-.prod-whatsapp svg{ width:14px; height:14px; }
+.prod-whatsapp svg{ width:14px; height:14px; flex:0 0 auto; margin-top:2px; }
 .prod-whatsapp:hover{ background:#dcf3e3; }
 @media (prefers-color-scheme:dark){
   .prod-whatsapp{ background:rgba(37,211,102,0.12); color:#3ddc6c; }
   .prod-whatsapp:hover{ background:rgba(37,211,102,0.2); }
+}
+@media (max-width:600px){
+  .prod-whatsapp{ font-size:10.5px; padding:7px 6px; gap:4px; }
+  .prod-whatsapp svg{ width:12px; height:12px; }
 }
 
 .k3d-shipping-card{ border:1px solid var(--line); border-radius:16px; padding:24px; background:var(--surface); max-width:640px; }

@@ -42,6 +42,79 @@ add_action( 'customize_register', function ( WP_Customize_Manager $wp_customize 
 		'section' => 'k3d_shop_shipping_info',
 		'type'    => 'textarea',
 	] );
+
+	$wp_customize->add_section( 'k3d_shop_sale_countdown', [
+		'title'    => __( 'عدّاد العروض والتخفيضات', 'k3d-shop' ),
+		'priority' => 32,
+	] );
+
+	$wp_customize->add_setting( 'k3d_sale_countdown_enabled', [
+		'default'           => true,
+		'sanitize_callback' => 'rest_sanitize_boolean',
+	] );
+
+	$wp_customize->add_control( 'k3d_sale_countdown_enabled', [
+		'label'   => __( 'إظهار عدّاد تنازلي في صفحة المنتج لو عليه تخفيض', 'k3d-shop' ),
+		'section' => 'k3d_shop_sale_countdown',
+		'type'    => 'checkbox',
+	] );
+
+	$wp_customize->add_setting( 'k3d_sale_countdown_days', [
+		'default'           => 7,
+		'sanitize_callback' => function ( $value ): int {
+			return min( 90, max( 1, absint( $value ) ) );
+		},
+	] );
+
+	$wp_customize->add_control( 'k3d_sale_countdown_days', [
+		'label'       => __( 'مدة العدّاد الافتراضية (بالأيام) - لو المنتج مفيهوش تاريخ انتهاء عرض محدد في ووكومرس', 'k3d-shop' ),
+		'description' => __( 'التغيير هنا بيأثر بس على العروض اللي هتتظبط جديدة أو اللي عدّادها خلص فعلاً - مش العروض اللي عدّادها شغال دلوقتي.', 'k3d-shop' ),
+		'section'     => 'k3d_shop_sale_countdown',
+		'type'        => 'number',
+		'input_attrs' => [ 'min' => 1, 'max' => 90, 'step' => 1 ],
+	] );
+
+	$wp_customize->add_section( 'k3d_shop_homepage_effects', [
+		'title'    => __( 'تأثيرات الصفحة الرئيسية', 'k3d-shop' ),
+		'priority' => 33,
+	] );
+
+	$wp_customize->add_setting( 'k3d_home_animations_enabled', [
+		'default'           => true,
+		'sanitize_callback' => 'rest_sanitize_boolean',
+	] );
+
+	$wp_customize->add_control( 'k3d_home_animations_enabled', [
+		'label'   => __( 'تفعيل حركات الظهور التدريجي والميدالية المتحركة في الصفحة الرئيسية', 'k3d-shop' ),
+		'section' => 'k3d_shop_homepage_effects',
+		'type'    => 'checkbox',
+	] );
+
+	$wp_customize->add_section( 'k3d_shop_products_page', [
+		'title'    => __( 'صفحة المنتجات', 'k3d-shop' ),
+		'priority' => 34,
+	] );
+
+	$wp_customize->add_setting( 'k3d_shop_infinite_scroll_enabled', [
+		'default'           => true,
+		'sanitize_callback' => 'rest_sanitize_boolean',
+	] );
+
+	$wp_customize->add_control( 'k3d_shop_infinite_scroll_enabled', [
+		'label'       => __( 'تحميل المنتجات تلقائيًا عند النزول لآخر الصفحة', 'k3d-shop' ),
+		'description' => __( 'لو متوقف، هيرجع ترقيم الصفحات العادي (الصفحة التالية).', 'k3d-shop' ),
+		'section'     => 'k3d_shop_products_page',
+		'type'        => 'checkbox',
+	] );
+} );
+
+/** كلاس على body لما حركات الصفحة الرئيسية موقوفة من Customizer، عشان الـCSS يقدر يوقفها بدل ما نكرر شرط PHP في كل مكان. */
+add_filter( 'body_class', function ( array $classes ): array {
+	if ( ! get_theme_mod( 'k3d_home_animations_enabled', true ) ) {
+		$classes[] = 'k3d-no-animations';
+	}
+
+	return $classes;
 } );
 
 function k3d_announcement_text(): string {

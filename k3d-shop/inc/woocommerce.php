@@ -52,10 +52,11 @@ add_filter( 'loop_shop_per_page', function () {
 /**
  * وقت انتهاء العرض لمنتج عليه تخفيض - من تاريخ "نهاية العرض" الحقيقي في
  * ووكومرس (Product data > عام > تاريخ انتهاء السعر) لو الأدمن حدده، وإلا
- * أسبوع بيبدأ من أول ظهور للعرض. بيتخزن في الميتا عشان العد التنازلي
- * يفضل ثابت مع كل تحميل للصفحة، ولو انتهى فعليًا بيتجدد تلقائيًا طول
- * ما المنتج لسه عليه تخفيض (يعني لو الأدمن مدّ العرض من غير ما يحدد
- * تاريخ، بيكمل عد أسبوع جديد بدل ما يفضل واقف على صفر).
+ * المدة الافتراضية المظبوطة من Customizer > العروض والتخفيضات (أسبوع لو
+ * الأدمن لسه ما غيّرش حاجة)، بتبدأ من أول ظهور للعرض. بيتخزن في الميتا
+ * عشان العد التنازلي يفضل ثابت مع كل تحميل للصفحة، ولو انتهى فعليًا
+ * بيتجدد تلقائيًا طول ما المنتج لسه عليه تخفيض (يعني لو الأدمن مدّ
+ * العرض من غير ما يحدد تاريخ، بيكمل عد جديد بدل ما يفضل واقف على صفر).
  */
 function k3d_sale_countdown_end( WC_Product $product ): ?int {
 	$to = $product->get_date_on_sale_to();
@@ -70,7 +71,8 @@ function k3d_sale_countdown_end( WC_Product $product ): ?int {
 		return $stored;
 	}
 
-	$end = time() + WEEK_IN_SECONDS;
+	$days = max( 1, (int) get_theme_mod( 'k3d_sale_countdown_days', 7 ) );
+	$end  = time() + ( $days * DAY_IN_SECONDS );
 	$product->update_meta_data( '_k3d_sale_countdown_end', $end );
 	$product->save_meta_data();
 
@@ -78,9 +80,13 @@ function k3d_sale_countdown_end( WC_Product $product ): ?int {
 }
 
 // عد تنازلي تحت سعر المنتج في صفحة المنتج المفرد لو عليه تخفيض - عشان
-// يشجع على الشراء قبل ما ينتهي العرض.
+// يشجع على الشراء قبل ما ينتهي العرض. قابل للإيقاف من Customizer.
 add_action( 'woocommerce_single_product_summary', function (): void {
 	global $product;
+
+	if ( ! get_theme_mod( 'k3d_sale_countdown_enabled', true ) ) {
+		return;
+	}
 
 	if ( ! $product instanceof WC_Product || ! $product->is_on_sale() ) {
 		return;

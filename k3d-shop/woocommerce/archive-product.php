@@ -45,7 +45,7 @@ $is_search = is_search();
 		</div>
 	</aside>
 
-	<div class="shop-main" data-k3d-infinite-scroll>
+	<div class="shop-main" <?php echo get_theme_mod( 'k3d_shop_infinite_scroll_enabled', true ) ? 'data-k3d-infinite-scroll' : ''; ?>>
 		<?php if ( woocommerce_product_loop() ) : ?>
 
 			<div class="shop-toolbar">
