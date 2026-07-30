@@ -27,6 +27,29 @@ add_action( 'admin_menu', function (): void {
 	);
 } );
 
+/**
+ * تشخيص مؤقت - عشان نعرف بالظبط ليه حساب الأدمن بيشوف "غير مسموح لك
+ * الوصول" على صفحة الإضافة رغم إنه أدمن. بيظهر في أي صفحة إدارة (مش
+ * بس صفحة الإضافة) عشان مانحتاجش نقدر نوصل للصفحة الأصلية أصلًا. هنشيله
+ * أول ما نعرف السبب.
+ */
+add_action( 'admin_notices', function (): void {
+	$user = wp_get_current_user();
+
+	printf(
+		'<div class="notice notice-info"><p><strong>%s</strong> %s: %s · %s: %s · %s: %s · %s: %s</p></div>',
+		esc_html__( 'تشخيص K3D 3D Customizer (مؤقت):', 'k3d-3d-customizer' ),
+		esc_html__( 'المستخدم', 'k3d-3d-customizer' ),
+		esc_html( $user->user_login ),
+		esc_html__( 'الأدوار', 'k3d-3d-customizer' ),
+		esc_html( implode( ', ', $user->roles ) ?: '(بدون دور)' ),
+		esc_html( 'manage_options' ),
+		current_user_can( 'manage_options' ) ? '✅' : '❌',
+		esc_html( 'manage_woocommerce' ),
+		current_user_can( 'manage_woocommerce' ) ? '✅' : '❌'
+	);
+} );
+
 function k3d_3dc_render_admin_page(): void {
 	if ( ! current_user_can( 'manage_options' ) ) {
 		return;
