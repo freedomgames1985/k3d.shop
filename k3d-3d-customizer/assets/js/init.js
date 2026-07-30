@@ -7,10 +7,53 @@
 
 const cfg = window.K3D_3DC_CONFIG || {};
 
+// API عامة بسيطة - أي كود تاني في الصفحة (زي ودجت "طلب أكتر من قطعة")
+// يقدر يستخدم نفس محرك Three.js اللي اتحمّل هنا من غير ما يعيد تحميله
+// تاني، ومن غير ما يعرف تفاصيل الـimport/التسجيل بتاعت التصاميم.
+let resolveEngine;
+let rejectEngine;
+const enginePromise = new Promise( ( resolve, reject ) => {
+	resolveEngine = resolve;
+	rejectEngine = reject;
+} );
+// اشتراك صامت عشان مطلعش "Unhandled promise rejection" في الكونسول لو
+// التحميل فشل ومفيش حد بيستخدم K3D_3DC.ready فعليًا في الصفحة دي.
+enginePromise.catch( () => {} );
+
+window.K3D_3DC = {
+	ready: enginePromise,
+	start: () => start(),
+	createPreview( canvas, designKey, value, colorHex ) {
+		return enginePromise.then( ( engine ) => {
+			const factory = engine.getDesignFactory( designKey );
+
+			if ( ! factory ) {
+				return null;
+			}
+
+			const stage = engine.createStage( canvas, engine.THREE, engine.OrbitControls );
+			const instance = factory( {
+				THREE: engine.THREE,
+				scene: stage.scene,
+				camera: stage.camera,
+				controls: stage.controls,
+				value,
+				colorHex,
+			} );
+
+			stage.resize();
+			stage.loop();
+
+			return { stage, instance };
+		} );
+	},
+};
+
 async function boot() {
 	const widgets = document.querySelectorAll( '[data-k3d-3dc]' );
 
 	if ( ! widgets.length || ! cfg.threeUrl ) {
+		rejectEngine( new Error( 'no widgets/config on this page' ) );
 		return;
 	}
 
@@ -47,10 +90,12 @@ async function boot() {
 				loading.textContent = cfg.i18n.previewFailed;
 			}
 		} );
+		rejectEngine( e );
 		return;
 	}
 
 	widgets.forEach( ( el ) => initWidget( el, { THREE, OrbitControls, createStage, getDesignFactory } ) );
+	resolveEngine( { THREE, OrbitControls, createStage, getDesignFactory } );
 }
 
 function initWidget( el, engine ) {
@@ -63,11 +108,19 @@ function initWidget( el, engine ) {
 		return;
 	}
 
+	// في صفحة المنتج الـcontrols (الاسم/الألوان) مش جوه نفس العنصر - دايمًا
+	// في بلوك منفصل جنب زرار "أضف للسلة" (product-render.php بيربطهم
+	// بـdata-k3d-3dc-for). في الهيرو لسه بلوك واحد زي ما كانوا.
+	const controlsRoot = el.querySelector( '.k3d-3dc-controls' )
+		? el
+		: ( document.querySelector( '[data-k3d-3dc-for="' + el.id + '"]' ) || el );
+
 	const canvas = el.querySelector( '.k3d-3dc-canvas' );
 	const loading = el.querySelector( '.k3d-3dc-loading' );
-	const input = el.querySelector( '.k3d-3dc-input' );
-	const colorButtons = Array.prototype.slice.call( el.querySelectorAll( '.k3d-3dc-color' ) );
-	const colorField = el.querySelector( '.k3d-3dc-color-field' );
+	const input = controlsRoot.querySelector( '.k3d-3dc-input' );
+	const colorButtons = Array.prototype.slice.call( controlsRoot.querySelectorAll( '.k3d-3dc-color' ) );
+	const colorField = controlsRoot.querySelector( '.k3d-3dc-color-field' );
+	const snapshotField = controlsRoot.querySelector( '.k3d-3dc-snapshot-field' );
 
 	if ( ! canvas ) {
 		return;
@@ -112,6 +165,36 @@ function initWidget( el, engine ) {
 			debounceTimer = setTimeout( () => {
 				instance.update( input.value, currentColorHex );
 			}, 120 );
+		} );
+	}
+
+	// صفحة المنتج: أول ما العميل يبدأ يكتب، صورة المنتج نفسها (المعرض)
+	// بتتحول للمعاينة الحية بدل ما تبقى بلوك منفصل تحت - بالظبط زي أي
+	// متجر تخصيص حقيقي. قبل ما يكتب، صور المنتج العادية فاضلة زي ما هي.
+	const galleryRoot = el.closest( '.product-gallery' );
+	if ( galleryRoot && input ) {
+		const revealGallery = function () {
+			if ( '' === input.value.trim() ) {
+				return;
+			}
+			galleryRoot.classList.add( 'k3d-3dc-gallery-active' );
+			resize();
+			input.removeEventListener( 'input', revealGallery );
+		};
+		input.addEventListener( 'input', revealGallery );
+	}
+
+	// لقطة من المعاينة (الشكل بالظبط اللي العميل صممه) بتتاخد لحظة "أضف
+	// للسلة" وتتبعت مع الطلب - عشان تظهر في السلة والطلب بدل الصورة
+	// العامة للمنتج.
+	const cartForm = controlsRoot.closest( 'form.cart' );
+	if ( cartForm && snapshotField ) {
+		cartForm.addEventListener( 'submit', () => {
+			try {
+				snapshotField.value = stage.renderer.domElement.toDataURL( 'image/jpeg', 0.82 );
+			} catch ( e ) {
+				snapshotField.value = '';
+			}
 		} );
 	}
 

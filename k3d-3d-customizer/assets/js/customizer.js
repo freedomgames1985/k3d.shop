@@ -16,7 +16,9 @@ export function getDesignFactory( key ) {
 }
 
 export function createStage( canvas, THREE, OrbitControls ) {
-	const renderer = new THREE.WebGLRenderer( { canvas, antialias: true, alpha: true } );
+	// preserveDrawingBuffer: true - عشان نقدر ناخد لقطة (toDataURL) من آخر
+	// فريم اتعرض وقت "أضف للسلة"، مش بس اللحظة اللي بعد render() مباشرة.
+	const renderer = new THREE.WebGLRenderer( { canvas, antialias: true, alpha: true, preserveDrawingBuffer: true } );
 	renderer.setPixelRatio( Math.min( window.devicePixelRatio || 1, 2 ) );
 	if ( 'outputColorSpace' in renderer ) {
 		renderer.outputColorSpace = THREE.SRGBColorSpace;

@@ -35,6 +35,25 @@ add_filter( 'woocommerce_add_to_cart_validation', function ( bool $passed, int $
 	return $passed;
 }, 10, 2 );
 
+/**
+ * لقطة المعاينة 3D (data URI) بتوصل كـPOST لحظة "أضف للسلة" - بنتأكد إنها
+ * فعلًا صورة JPEG/PNG بالـbase64 قبل ما نقبلها، وبنحط سقف حجم معقول
+ * (~400 كيلوبايت) عشان محدش يقدر يحط أي نص كبير في الحقل ده.
+ */
+function k3d_3dc_sanitize_snapshot( string $raw ): string {
+	$raw = trim( $raw );
+
+	if ( '' === $raw || strlen( $raw ) > 400000 ) {
+		return '';
+	}
+
+	if ( ! preg_match( '#^data:image/(?:jpeg|png);base64,[A-Za-z0-9+/]+=*$#', $raw ) ) {
+		return '';
+	}
+
+	return $raw;
+}
+
 add_filter( 'woocommerce_add_cart_item_data', function ( array $cart_item_data, int $product_id ): array {
 	if ( ! k3d_3dc_product_enabled( $product_id ) || empty( $_POST['k3d_3dc_value'] ) ) {
 		return $cart_item_data;
@@ -42,10 +61,24 @@ add_filter( 'woocommerce_add_cart_item_data', function ( array $cart_item_data, 
 
 	$cart_item_data['k3d_3dc_value'] = sanitize_text_field( wp_unslash( $_POST['k3d_3dc_value'] ) );
 	$cart_item_data['k3d_3dc_color'] = isset( $_POST['k3d_3dc_color'] ) ? sanitize_key( wp_unslash( $_POST['k3d_3dc_color'] ) ) : '';
+
+	if ( ! empty( $_POST['k3d_3dc_snapshot'] ) ) {
+		$cart_item_data['k3d_3dc_snapshot'] = k3d_3dc_sanitize_snapshot( wp_unslash( $_POST['k3d_3dc_snapshot'] ) );
+	}
+
 	// كل تخصيص مختلف لازم يفضل سطر منفصل في السلة، مش يتجمع مع تخصيص تاني لنفس المنتج.
 	$cart_item_data['k3d_3dc_unique'] = md5( microtime() . wp_rand() );
 
 	return $cart_item_data;
+}, 10, 2 );
+
+/** في صفحة/ودجت السلة: بنستبدل صورة المنتج العامة بلقطة المعاينة الحقيقية اللي العميل صممها. */
+add_filter( 'woocommerce_cart_item_thumbnail', function ( string $thumbnail_html, array $cart_item ) {
+	if ( empty( $cart_item['k3d_3dc_snapshot'] ) ) {
+		return $thumbnail_html;
+	}
+
+	return '<img src="' . esc_attr( $cart_item['k3d_3dc_snapshot'] ) . '" alt="" class="k3d-3dc-cart-snapshot" style="border-radius:8px;object-fit:cover;" />';
 }, 10, 2 );
 
 function k3d_3dc_color_label( string $design_key, string $color_id ): string {
@@ -98,6 +131,11 @@ add_action( 'woocommerce_checkout_create_order_line_item', function ( WC_Order_I
 	$item->add_meta_data( '_k3d_3dc_value', $values['k3d_3dc_value'] );
 	$item->add_meta_data( '_k3d_3dc_color', $values['k3d_3dc_color'] ?? '' );
 
+	if ( ! empty( $values['k3d_3dc_snapshot'] ) ) {
+		// مخفي (بادئة _) عشان الـbase64 الطويل ميظهرش كنص جوه تفاصيل الطلب/الإيميل - بيتعرض كصورة بدل كده تحت.
+		$item->add_meta_data( '_k3d_3dc_snapshot', $values['k3d_3dc_snapshot'] );
+	}
+
 	if ( ! empty( $values['k3d_3dc_color'] ) ) {
 		$label = k3d_3dc_color_label( $design_key, $values['k3d_3dc_color'] );
 
@@ -106,3 +144,21 @@ add_action( 'woocommerce_checkout_create_order_line_item', function ( WC_Order_I
 		}
 	}
 }, 10, 4 );
+
+/** في شاشة الطلب بلوحة التحكم: بنعرض لقطة المعاينة كصورة صغيرة تحت اسم المنتج، عشان فريق الإنتاج يشوف التصميم بالظبط زي ما العميل طلبه. */
+add_action( 'woocommerce_after_order_itemmeta', function ( int $item_id, WC_Order_Item $item, $product ): void {
+	if ( ! is_admin() || ! $item instanceof WC_Order_Item_Product ) {
+		return;
+	}
+
+	$snapshot = $item->get_meta( '_k3d_3dc_snapshot' );
+
+	if ( ! $snapshot ) {
+		return;
+	}
+
+	printf(
+		'<img src="%s" alt="" style="display:block;margin-top:6px;max-width:140px;border-radius:8px;border:1px solid #e0e0e0;" />',
+		esc_attr( $snapshot )
+	);
+}, 10, 3 );
