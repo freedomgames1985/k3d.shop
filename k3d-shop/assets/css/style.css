@@ -331,7 +331,7 @@ html[dir="rtl"] .hero::before{
 
 /* medal graphic */
 .medal-wrap{ position:relative; display:flex; align-items:center; justify-content:center; height:380px; }
-.medal-ring{ position:absolute; border-radius:50%; border:1px dashed var(--line-strong); }
+.medal-ring{ position:absolute; border-radius:50%; border:1px dashed rgba(243,245,241,0.35); }
 .medal-ring.r1{ width:340px;height:340px; animation:k3d-spin-slow 46s linear infinite; }
 .medal-ring.r2{ width:260px;height:260px; animation:k3d-spin-slow 32s linear infinite reverse; }
 @keyframes k3d-spin-slow{ to{ transform:rotate(360deg); } }
@@ -362,7 +362,7 @@ html[dir="rtl"] .hero::before{
 .medal-ribbon{ position:absolute; top:-64px; width:70px;height:100px; display:flex; gap:6px; }
 .medal-ribbon i{ flex:1; clip-path:polygon(0 0,100% 0,100% 82%,50% 100%,0 82%); }
 .medal-ribbon i:nth-child(1){ background:var(--clay-500); }
-.medal-ribbon i:nth-child(2){ background:var(--ink-700); border:1px solid rgba(255,255,255,0.15); }
+.medal-ribbon i:nth-child(2){ background:#3a5a5f; border:1px solid rgba(255,255,255,0.15); }
 
 /* ---------- sections ---------- */
 section{ padding:64px 0; }

@@ -94,6 +94,10 @@ add_action( 'woocommerce_checkout_create_order_line_item', function ( WC_Order_I
 
 	$item->add_meta_data( $design['value_label'] ?? __( 'التخصيص', 'k3d-3d-customizer' ), $values['k3d_3dc_value'] );
 
+	// مفاتيح مخفية (بادئة _) ثابتة الاسم بغض النظر عن لغة الموقع - Generation Manager بيقرا منها، مش من العنوان المعروض للعميل.
+	$item->add_meta_data( '_k3d_3dc_value', $values['k3d_3dc_value'] );
+	$item->add_meta_data( '_k3d_3dc_color', $values['k3d_3dc_color'] ?? '' );
+
 	if ( ! empty( $values['k3d_3dc_color'] ) ) {
 		$label = k3d_3dc_color_label( $design_key, $values['k3d_3dc_color'] );
 
