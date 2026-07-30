@@ -65,6 +65,7 @@ function initWidget( el, engine ) {
 	}
 
 	const stage = engine.createStage( canvas, engine.THREE, engine.OrbitControls );
+	const initialCameraPos = stage.camera.position.clone();
 
 	let currentColorHex = ( designDef.colors[ 0 ] || {} ).hex || '#D9583A';
 
@@ -118,10 +119,67 @@ function initWidget( el, engine ) {
 			instance.update( input ? input.value : '', currentColorHex );
 		} );
 	} );
+
+	const refreshBtn = el.querySelector( '.k3d-3dc-refresh' );
+	if ( refreshBtn ) {
+		refreshBtn.addEventListener( 'click', () => {
+			stage.camera.position.copy( initialCameraPos );
+			stage.controls.target.set( 0, 0, 0 );
+			stage.controls.autoRotate = true;
+			stage.controls.update();
+		} );
+	}
+
+	const expandBtn = el.querySelector( '.k3d-3dc-expand' );
+	const stageEl = el.querySelector( '.k3d-3dc-stage' );
+	if ( expandBtn && stageEl && ( stageEl.requestFullscreen || stageEl.webkitRequestFullscreen ) ) {
+		expandBtn.addEventListener( 'click', () => {
+			const isFullscreen = document.fullscreenElement || document.webkitFullscreenElement;
+
+			if ( isFullscreen ) {
+				( document.exitFullscreen || document.webkitExitFullscreen ).call( document );
+			} else {
+				( stageEl.requestFullscreen || stageEl.webkitRequestFullscreen ).call( stageEl );
+			}
+		} );
+
+		[ 'fullscreenchange', 'webkitfullscreenchange' ].forEach( ( ev ) => {
+			document.addEventListener( ev, resize );
+		} );
+	} else if ( expandBtn ) {
+		expandBtn.hidden = true;
+	}
 }
 
-if ( document.readyState === 'loading' ) {
-	document.addEventListener( 'DOMContentLoaded', boot );
+/**
+ * تحميل مؤجّل: Three.js + المحرك تقيلين شوية (~600 كيلوبايت)، فمفيش داعي
+ * نحمّلهم فورًا مع كل تحميل صفحة حتى لو الزائر مش هيلمس الودجت خالص -
+ * أول تفاعل حقيقي في الصفحة (لمس/كتابة/فوكس) أو مهلة قصيرة لو مفيش
+ * تفاعل، أيهما أسرع.
+ */
+function whenDomReady( fn ) {
+	if ( document.readyState === 'loading' ) {
+		document.addEventListener( 'DOMContentLoaded', fn, { once: true } );
+	} else {
+		fn();
+	}
+}
+
+let started = false;
+function start() {
+	if ( started ) {
+		return;
+	}
+	started = true;
+	whenDomReady( boot );
+}
+
+[ 'pointerdown', 'touchstart', 'focusin', 'keydown' ].forEach( ( ev ) => {
+	document.addEventListener( ev, start, { once: true, passive: true, capture: true } );
+} );
+
+if ( 'requestIdleCallback' in window ) {
+	requestIdleCallback( start, { timeout: 2500 } );
 } else {
-	boot();
+	setTimeout( start, 1800 );
 }

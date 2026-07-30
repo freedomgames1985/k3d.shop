@@ -35,11 +35,24 @@ function k3d_3dc_render_widget( string $design_key, string $default_value = '', 
 	>
 		<div class="k3d-3dc-stage">
 			<span class="k3d-3dc-badge"><i></i><?php echo esc_html( $args['live_label'] ?? __( 'معاينة حية', 'k3d-3d-customizer' ) ); ?></span>
+			<div class="k3d-3dc-stage-actions">
+				<button type="button" class="k3d-3dc-refresh" aria-label="<?php esc_attr_e( 'إعادة ضبط المعاينة', 'k3d-3d-customizer' ); ?>" title="<?php esc_attr_e( 'إعادة ضبط المعاينة', 'k3d-3d-customizer' ); ?>">↻</button>
+				<button type="button" class="k3d-3dc-expand" aria-label="<?php esc_attr_e( 'ملء الشاشة', 'k3d-3d-customizer' ); ?>" title="<?php esc_attr_e( 'ملء الشاشة', 'k3d-3d-customizer' ); ?>">⛶</button>
+			</div>
 			<canvas class="k3d-3dc-canvas"></canvas>
 			<div class="k3d-3dc-loading"><?php esc_html_e( 'جاري تجهيز المعاينة...', 'k3d-3d-customizer' ); ?></div>
 			<span class="k3d-3dc-hint"><?php esc_html_e( 'اسحب للتدوير · عجلة الماوس للتكبير', 'k3d-3d-customizer' ); ?></span>
 		</div>
 		<div class="k3d-3dc-controls">
+			<p class="k3d-3dc-input-hint">
+				<?php
+				printf(
+					/* translators: %d: أقصى عدد حروف */
+					esc_html__( 'حتى %d حرف · عربي / إنجليزي / أي لغة', 'k3d-3d-customizer' ),
+					(int) $design['max_length']
+				);
+				?>
+			</p>
 			<input
 				type="text"
 				class="k3d-3dc-input"
@@ -63,6 +76,9 @@ function k3d_3dc_render_widget( string $design_key, string $default_value = '', 
 			<?php if ( $color_field ) : ?>
 				<input type="hidden" class="k3d-3dc-color-field" name="<?php echo esc_attr( $color_field ); ?>" value="<?php echo esc_attr( $default_color ); ?>" />
 			<?php endif; ?>
+			<p class="k3d-3dc-warning">
+				<?php esc_html_e( 'ℹ️ الألوان في المعاينة تقريبية وممكن تختلف شوية عن اللون المطبوع فعليًا. المنتج بيتصنّع بالظبط زي ما اتكتب هنا - راجع الإملاء وحالة الحروف قبل الطلب.', 'k3d-3d-customizer' ); ?>
+			</p>
 		</div>
 	</div>
 	<?php
@@ -81,5 +97,39 @@ add_action( 'woocommerce_before_add_to_cart_button', function (): void {
 		k3d_3dc_product_default_value( $product->get_id() ),
 		'product'
 	);
+	k3d_3dc_render_specs( $product->get_id() );
 	echo '</div>';
 } );
+
+/** قايمة مواصفات ثابتة (طول، ارتفاع الحرف، الخامة...) - نص حر يظبطه الأدمن لكل منتج، سطر لكل مواصفة بصيغة "التسمية: القيمة". */
+function k3d_3dc_render_specs( int $product_id ): void {
+	$raw = trim( (string) get_post_meta( $product_id, K3D_3DC_META_SPECS, true ) );
+
+	if ( '' === $raw ) {
+		return;
+	}
+
+	$lines = array_filter( array_map( 'trim', explode( "\n", $raw ) ) );
+
+	if ( empty( $lines ) ) {
+		return;
+	}
+	?>
+	<div class="k3d-3dc-specs">
+		<h4><?php esc_html_e( 'مواصفات المنتج', 'k3d-3d-customizer' ); ?></h4>
+		<ul>
+			<?php foreach ( $lines as $line ) : ?>
+				<?php
+				$parts = explode( ':', $line, 2 );
+				$label = trim( $parts[0] ?? '' );
+				$value = trim( $parts[1] ?? '' );
+				?>
+				<li>
+					<span><?php echo esc_html( $label ); ?></span>
+					<?php if ( '' !== $value ) : ?><b><?php echo esc_html( $value ); ?></b><?php endif; ?>
+				</li>
+			<?php endforeach; ?>
+		</ul>
+	</div>
+	<?php
+}

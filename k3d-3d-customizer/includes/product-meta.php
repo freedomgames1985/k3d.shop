@@ -14,6 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 const K3D_3DC_META_ENABLED = '_k3d_3dc_enabled';
 const K3D_3DC_META_DESIGN  = '_k3d_3dc_design';
 const K3D_3DC_META_DEFAULT = '_k3d_3dc_default_value';
+const K3D_3DC_META_SPECS   = '_k3d_3dc_specs';
 
 function k3d_3dc_product_enabled( int $product_id ): bool {
 	return $product_id > 0 && 'yes' === get_post_meta( $product_id, K3D_3DC_META_ENABLED, true );
@@ -80,6 +81,13 @@ function k3d_3dc_render_product_meta_box( WP_Post $post ): void {
 		</label>
 		<input type="text" name="k3d_3dc_default" id="k3d_3dc_default" style="width:100%;" value="<?php echo esc_attr( $default ); ?>" />
 	</p>
+	<p>
+		<label for="k3d_3dc_specs" style="display:block;font-weight:600;margin-bottom:4px;">
+			<?php esc_html_e( 'مواصفات تظهر تحت المعاينة (اختياري)', 'k3d-3d-customizer' ); ?>
+		</label>
+		<textarea name="k3d_3dc_specs" id="k3d_3dc_specs" style="width:100%;" rows="4" placeholder="<?php echo esc_attr( "ارتفاع الحرف: 10 مم\nالخامة: PLA صديقة للبيئة" ); ?>"><?php echo esc_textarea( (string) get_post_meta( $post->ID, K3D_3DC_META_SPECS, true ) ); ?></textarea>
+		<span class="description"><?php esc_html_e( 'سطر لكل مواصفة، بصيغة: التسمية: القيمة', 'k3d-3d-customizer' ); ?></span>
+	</p>
 	<p class="description">
 		<?php esc_html_e( 'النص واللون اللي العميل يختارهم هيتسجلوا تلقائيًا في تفاصيل الطلب (السلة، صفحة الطلب في الأدمن، وإيميلات ووكومرس) - مفيش أي ملف طباعة بيتولّد، بس المعلومات دي.', 'k3d-3d-customizer' ); ?>
 	</p>
@@ -110,5 +118,9 @@ add_action( 'save_post_product', function ( int $post_id ): void {
 
 	if ( isset( $_POST['k3d_3dc_default'] ) ) {
 		update_post_meta( $post_id, K3D_3DC_META_DEFAULT, sanitize_text_field( wp_unslash( $_POST['k3d_3dc_default'] ) ) );
+	}
+
+	if ( isset( $_POST['k3d_3dc_specs'] ) ) {
+		update_post_meta( $post_id, K3D_3DC_META_SPECS, sanitize_textarea_field( wp_unslash( $_POST['k3d_3dc_specs'] ) ) );
 	}
 } );
