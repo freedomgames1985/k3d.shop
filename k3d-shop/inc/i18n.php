@@ -1,0 +1,159 @@
+<?php
+/**
+ * دعم تعدد اللغات (RTL/LTR + اختيار عائلة الخط حسب السكريبت). القالب بيحل
+ * اللغة الحالية بنفس منطق StorefrontTranslation::resolved_lang() في
+ * k3d-shop-api (؟lang= ثم كوكيز k3d_lang)، لأن الدالة الأصلية private ومش
+ * متاحة من برّه الإضافة - لكن بيستخدم نفس اسم الكوكيز الحقيقي
+ * (StorefrontTranslation::COOKIE_NAME) عشان يفضلوا متزامنين مع بعض دايمًا.
+ *
+ * ده الفرق الأساسي عن حل الـCSS المؤقت اللي كان في بلجن k3d-shop: هنا
+ * القالب بيتحكم في header.php نفسه من الأول (dir على <html> مباشرة)، مش
+ * بيحاول يغلب ثيم تالت بـ !important.
+ *
+ * @package K3D_Shop
+ */
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+/**
+ * نفس الـ13 لغة اللي StorefrontTranslation::LANGUAGE_DIRECTORY بتدعمها في
+ * الإضافة، بنفس الترتيب اللي resolved_lang()/render_language_switcher()
+ * بيرجعوه (en, ar, he الأول، بعدين الباقي).
+ */
+function k3d_language_directory(): array {
+	return [
+		'en' => [ 'name' => 'English', 'flag' => '🇬🇧', 'dir' => 'ltr', 'script' => 'latin' ],
+		'ar' => [ 'name' => 'العربية', 'flag' => '🇸🇦', 'dir' => 'rtl', 'script' => 'arabic' ],
+		'he' => [ 'name' => 'עברית', 'flag' => '🇮🇱', 'dir' => 'rtl', 'script' => 'hebrew' ],
+		'es' => [ 'name' => 'Español', 'flag' => '🇪🇸', 'dir' => 'ltr', 'script' => 'latin' ],
+		'de' => [ 'name' => 'Deutsch', 'flag' => '🇩🇪', 'dir' => 'ltr', 'script' => 'latin' ],
+		'it' => [ 'name' => 'Italiano', 'flag' => '🇮🇹', 'dir' => 'ltr', 'script' => 'latin' ],
+		'fr' => [ 'name' => 'Français', 'flag' => '🇫🇷', 'dir' => 'ltr', 'script' => 'latin' ],
+		'ru' => [ 'name' => 'Русский', 'flag' => '🇷🇺', 'dir' => 'ltr', 'script' => 'latin' ],
+		'uk' => [ 'name' => 'Українська', 'flag' => '🇺🇦', 'dir' => 'ltr', 'script' => 'latin' ],
+		'pl' => [ 'name' => 'Polski', 'flag' => '🇵🇱', 'dir' => 'ltr', 'script' => 'latin' ],
+		'hu' => [ 'name' => 'Magyar', 'flag' => '🇭🇺', 'dir' => 'ltr', 'script' => 'latin' ],
+		'nl' => [ 'name' => 'Nederlands', 'flag' => '🇳🇱', 'dir' => 'ltr', 'script' => 'latin' ],
+		'hi' => [ 'name' => 'हिन्दी', 'flag' => '🇮🇳', 'dir' => 'ltr', 'script' => 'devanagari' ],
+	];
+}
+
+/** اسم كوكيز اللغة - نفس StorefrontTranslation::COOKIE_NAME بالظبط لو الإضافة موجودة. */
+function k3d_lang_cookie_name(): string {
+	if ( class_exists( '\K3D\ShopAPI\Frontend\StorefrontTranslation' ) ) {
+		return \K3D\ShopAPI\Frontend\StorefrontTranslation::COOKIE_NAME;
+	}
+
+	return 'k3d_lang';
+}
+
+/**
+ * اللغة الحالية المفعّلة - بنفس أولوية resolved_lang() في الإضافة:
+ * ?lang= أولاً، بعدين كوكيز k3d_lang، وبعدين الافتراضي (عربي).
+ */
+function k3d_current_lang(): string {
+	static $cache = null;
+
+	if ( null !== $cache ) {
+		return $cache;
+	}
+
+	$directory = k3d_language_directory();
+	$cookie    = k3d_lang_cookie_name();
+
+	$lang = '';
+
+	if ( ! empty( $_GET['lang'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$lang = sanitize_key( wp_unslash( $_GET['lang'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	} elseif ( ! empty( $_COOKIE[ $cookie ] ) ) {
+		$lang = sanitize_key( wp_unslash( $_COOKIE[ $cookie ] ) );
+	}
+
+	if ( '' === $lang || ! isset( $directory[ $lang ] ) ) {
+		$lang = 'ar';
+	}
+
+	return $cache = $lang;
+}
+
+function k3d_current_lang_meta(): array {
+	$directory = k3d_language_directory();
+
+	return $directory[ k3d_current_lang() ] ?? $directory['ar'];
+}
+
+function k3d_is_rtl(): bool {
+	return 'rtl' === k3d_current_lang_meta()['dir'];
+}
+
+/** يطابق dir="rtl"/"ltr" على <html> مع اللغة الفعلية - بدل ما يفضل ثابت على لغة الموقع الأساسية. */
+add_filter( 'language_attributes', function ( string $output ): string {
+	$meta = k3d_current_lang_meta();
+
+	if ( preg_match( '/dir="(rtl|ltr)"/', $output ) ) {
+		$output = preg_replace( '/dir="(rtl|ltr)"/', 'dir="' . esc_attr( $meta['dir'] ) . '"', $output );
+	} else {
+		$output .= ' dir="' . esc_attr( $meta['dir'] ) . '"';
+	}
+
+	return $output . ' data-lang-script="' . esc_attr( $meta['script'] ) . '"';
+} );
+
+add_filter( 'body_class', function ( array $classes ): array {
+	$classes   = array_diff( $classes, [ 'rtl', 'ltr' ] );
+	$classes[] = k3d_is_rtl() ? 'rtl' : 'ltr';
+
+	return $classes;
+} );
+
+/**
+ * ترجمة نصوص الثيم الثابتة (القوائم، الأزرار، عناوين الصفحة الرئيسية،
+ * الفوتر...) - دي منفصلة تمامًا عن نظام ترجمة المحتوى بالـAI بتاع
+ * k3d-shop-api (اللي بيترجم بس عنوان/وصف المنتج والصفحة والتصنيف من
+ * الداتابيز عبر StorefrontTranslation)، لأن نصوص الثيم دي مكتوبة كـmsgid
+ * عربي داخل __()/_e() نفسها ومفيش لها "entity" في الإضافة تتترجم بيه.
+ * بنعتمد على قاموس ثابت (k3d_i18n_dictionary() في i18n-strings.php) بدل
+ * ملفات .mo عشان يفضل شغال فورًا من غير build step، وبيتفعّل بس في
+ * الواجهة (مش الأدمن) عشان لوحة التحكم تفضل زي ما هي.
+ */
+if ( ! is_admin() ) {
+	add_filter( 'gettext', function ( $translation, $text, $domain ) {
+		if ( 'k3d-shop' !== $domain ) {
+			return $translation;
+		}
+
+		return k3d_translate( (string) $text );
+	}, 10, 3 );
+
+	add_filter( 'gettext_with_context', function ( $translation, $text, $context, $domain ) {
+		if ( 'k3d-shop' !== $domain ) {
+			return $translation;
+		}
+
+		return k3d_translate( (string) $text );
+	}, 10, 4 );
+
+	add_filter( 'ngettext', function ( $translation, $single, $plural, $number, $domain ) {
+		if ( 'k3d-shop' !== $domain ) {
+			return $translation;
+		}
+
+		return k3d_translate( (string) $translation );
+	}, 10, 5 );
+
+	// عناوين عناصر القائمة (Appearance > Menus) نصوص مكتوبة في الداتابيز
+	// من الأدمن نفسه - مش هتتترجم زي msgid الثابتة، فبنجرب نلاقيها في نفس
+	// القاموس (لو مطابقة للنص الافتراضي)، وإلا بتفضل زي ما هي.
+	add_filter( 'nav_menu_item_title', function ( $title ) {
+		return k3d_translate( (string) $title );
+	} );
+}
+
+/**
+ * StorefrontTranslation بتحقن قائمة لغة عايمة تلقائيًا في كل صفحة (fixed)
+ * عبر wp_body_open. القالب مبقاش بيعرض نسخته الخاصة في الشريط العلوي
+ * (شيلناها من header.php) عشان تفضل نسخة عايمة واحدة بس من الإضافة، بدل
+ * ما تتكرر.
+ */

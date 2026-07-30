@@ -1,0 +1,116 @@
+.k3d-3dc-widget, .k3d-3dc-controls-ext{
+  --k3d-3dc-ink: #0E2024;
+  --k3d-3dc-clay: #D9583A;
+  --k3d-3dc-paper: #F3F5F1;
+  --k3d-3dc-line: rgba(14,32,36,0.12);
+  max-width: 480px;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+.k3d-3dc-widget *, .k3d-3dc-controls-ext *{ box-sizing: border-box; }
+.k3d-3dc-stage{
+  position: relative;
+  aspect-ratio: 4 / 3;
+  background: linear-gradient(180deg, var(--k3d-3dc-paper), #e9ece5);
+  border: 1px solid var(--k3d-3dc-line);
+  border-radius: 16px;
+  overflow: hidden;
+}
+.k3d-3dc-canvas{ width:100%; height:100%; display:block; touch-action:none; cursor:grab; }
+.k3d-3dc-canvas:active{ cursor:grabbing; }
+.k3d-3dc-badge{
+  position:absolute; top:10px; inset-inline-start:10px;
+  display:flex; align-items:center; gap:6px;
+  background:rgba(255,255,255,0.85); -webkit-backdrop-filter:blur(4px); backdrop-filter:blur(4px);
+  padding:5px 10px; border-radius:999px;
+  font-size:11px; font-weight:600; color:var(--k3d-3dc-ink);
+  pointer-events: none;
+}
+.k3d-3dc-badge i{ width:7px;height:7px;border-radius:50%; background:#22c55e; display:block; flex:0 0 auto; }
+.k3d-3dc-stage-actions{ position:absolute; top:10px; inset-inline-end:10px; display:flex; gap:6px; z-index:2; }
+.k3d-3dc-refresh, .k3d-3dc-expand{
+  width:28px; height:28px; border-radius:50%; border:0; cursor:pointer;
+  background:rgba(255,255,255,0.85); color:var(--k3d-3dc-ink);
+  font-size:14px; line-height:1; display:flex; align-items:center; justify-content:center;
+  -webkit-backdrop-filter:blur(4px); backdrop-filter:blur(4px);
+}
+.k3d-3dc-refresh:hover, .k3d-3dc-expand:hover{ background:#fff; }
+.k3d-3dc-hint{
+  position:absolute; bottom:8px; inset-inline-end:10px;
+  font-size:10.5px; color:rgba(14,32,36,0.55);
+  pointer-events: none;
+}
+.k3d-3dc-loading{
+  position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+  font-size:12.5px; color:var(--k3d-3dc-ink); background:rgba(243,245,241,0.65);
+}
+.k3d-3dc-widget.is-ready .k3d-3dc-loading{ display:none; }
+
+.k3d-3dc-controls{ margin-top:14px; display:flex; flex-direction:column; gap:12px; }
+.k3d-3dc-input-hint{ margin:0; font-size:11.5px; color:rgba(14,32,36,0.55); text-align:center; }
+.k3d-3dc-warning{ margin:0; font-size:11px; line-height:1.6; color:rgba(14,32,36,0.55); text-align:center; }
+.k3d-3dc-input, .k3d-3dc-input-2{
+  width:100%; border:1.5px solid var(--k3d-3dc-line); border-radius:10px;
+  padding:12px 14px; font-size:15px; text-align:center;
+  background:#fff; color: var(--k3d-3dc-ink); font-family:inherit;
+}
+.k3d-3dc-input-2{ font-size:13.5px; padding:10px 14px; }
+.k3d-3dc-input:focus, .k3d-3dc-input-2:focus{ outline:none; border-color: var(--k3d-3dc-clay); }
+.k3d-3dc-colors{ display:flex; align-items:center; justify-content:center; gap:8px; flex-wrap:wrap; }
+.k3d-3dc-color{
+  width:26px;height:26px;border-radius:50%; cursor:pointer;
+  background: var(--k3d-3dc-sw); border:2px solid transparent;
+  box-shadow: 0 0 0 1px var(--k3d-3dc-line);
+  padding:0;
+}
+.k3d-3dc-color.is-active{ box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--k3d-3dc-clay); }
+
+/* لو المعاينة 3D فشلت تحمّل (شبكة/CDN/إضافة حظر) بنسيب الفورم (الاسم
+واللون) شغال وقابل للطلب - مش منطقي نخبي الودجت كله بسبب الكانفاس بس. */
+.k3d-3dc-widget.k3d-3dc-failed .k3d-3dc-badge,
+.k3d-3dc-widget.k3d-3dc-failed .k3d-3dc-stage-actions,
+.k3d-3dc-widget.k3d-3dc-failed .k3d-3dc-hint{ display:none; }
+
+.k3d-3dc-specs{ margin-top:16px; max-width:420px; }
+.k3d-3dc-specs h4{ margin:0 0 8px; font-size:12.5px; font-weight:700; color:var(--k3d-3dc-ink); }
+.k3d-3dc-specs ul{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:6px; }
+.k3d-3dc-specs li{ display:flex; justify-content:space-between; gap:10px; font-size:12.5px; color:rgba(14,32,36,0.7); border-bottom:1px dashed var(--k3d-3dc-line); padding-bottom:6px; }
+.k3d-3dc-specs li b{ color:var(--k3d-3dc-ink); font-weight:600; }
+@media (prefers-color-scheme: dark){
+  .k3d-3dc-specs li{ color:rgba(243,245,241,0.65); }
+  .k3d-3dc-specs h4, .k3d-3dc-specs li b{ color:#F3F5F1; }
+}
+
+/* هيرو الصفحة الرئيسية - مساحة أوسع شوية */
+.k3d-3dc-mode-hero{ max-width:560px; margin-inline-start:auto; margin-inline-end:auto; }
+.k3d-3dc-mode-hero .k3d-3dc-stage{ aspect-ratio: 16 / 11; }
+
+/* صفحة المنتج - الـcontrols (الاسم/الألوان) فوق زرار أضف للسلة مباشرة */
+.k3d-3dc-product-wrap{ margin: 4px 0 22px; max-width:420px; }
+.k3d-3dc-mode-product .k3d-3dc-stage{ aspect-ratio: 16 / 10; }
+
+/* صفحة المنتج - الـstage (الكانفاس) بيحل محل معرض الصور نفسه، ومخفي
+لحد ما العميل يبدأ يكتب (بتتضاف .k3d-3dc-gallery-active من الجافاسكربت) -
+بنسيب معرض ووكومرس الأصلي في مكانه (visibility، مش display) عشان يفضل
+محدد ارتفاع/عرض الحاوية اللي الستيدج بيتمدد عليها. */
+.product-gallery{ position: relative; }
+.product-gallery .k3d-3dc-mode-product{
+  position: absolute; inset: 0; z-index: 5;
+  max-width: none; margin: 0; display: none;
+}
+.product-gallery.k3d-3dc-gallery-active .k3d-3dc-mode-product{ display: block; }
+.product-gallery.k3d-3dc-gallery-active > *:not(.k3d-3dc-mode-product){ visibility: hidden; }
+.product-gallery .k3d-3dc-mode-product .k3d-3dc-stage{
+  position: absolute; inset: 0; aspect-ratio: auto;
+}
+
+@media (prefers-color-scheme: dark){
+  .k3d-3dc-widget, .k3d-3dc-controls-ext{ --k3d-3dc-paper:#132A2F; --k3d-3dc-ink:#F3F5F1; --k3d-3dc-line:rgba(243,245,241,0.16); }
+  .k3d-3dc-stage{ background:linear-gradient(180deg,#132A2F,#0E2024); }
+  .k3d-3dc-input, .k3d-3dc-input-2{ background:#1E3A40; border-color:rgba(243,245,241,0.18); color:#F3F5F1; }
+  .k3d-3dc-badge{ background:rgba(19,42,47,0.85); color:#F3F5F1; }
+  .k3d-3dc-refresh, .k3d-3dc-expand{ background:rgba(19,42,47,0.85); color:#F3F5F1; }
+  .k3d-3dc-refresh:hover, .k3d-3dc-expand:hover{ background:#132A2F; }
+  .k3d-3dc-loading{ background:rgba(19,42,47,0.7); }
+  .k3d-3dc-input-hint, .k3d-3dc-warning{ color:rgba(243,245,241,0.55); }
+}
