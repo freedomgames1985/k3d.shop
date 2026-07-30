@@ -37,19 +37,29 @@ function k3d_3dc_render_controls_inner( array $design, string $default_value, st
 	<?php if ( $field_name ) : ?>
 		<button type="button" class="k3d-3dcb-trigger" id="k3d-3dcb-trigger">🎁 <?php esc_html_e( 'عايز أكتر من قطعة؟ اطلب دفعة واحدة', 'k3d-3d-customizer' ); ?></button>
 	<?php endif; ?>
+	<?php $is_digits = 'digits-dash' === ( $design['charset'] ?? '' ); ?>
 	<p class="k3d-3dc-input-hint">
 		<?php
-		printf(
-			/* translators: %d: أقصى عدد حروف */
-			esc_html__( 'حتى %d حرف · عربي / إنجليزي / أي لغة', 'k3d-3d-customizer' ),
-			(int) $design['max_length']
-		);
+		if ( $is_digits ) {
+			printf(
+				/* translators: %d: أقصى عدد حروف */
+				esc_html__( 'حتى %d رقم · أرقام وشرطة (-) بس', 'k3d-3d-customizer' ),
+				(int) $design['max_length']
+			);
+		} else {
+			printf(
+				/* translators: %d: أقصى عدد حروف */
+				esc_html__( 'حتى %d حرف · عربي / إنجليزي / أي لغة', 'k3d-3d-customizer' ),
+				(int) $design['max_length']
+			);
+		}
 		?>
 	</p>
 	<input
 		type="text"
 		class="k3d-3dc-input"
 		<?php echo $field_name ? 'name="' . esc_attr( $field_name ) . '"' : ''; ?>
+		<?php echo $is_digits ? 'dir="ltr"' : ''; ?>
 		maxlength="<?php echo esc_attr( (string) $design['max_length'] ); ?>"
 		value="<?php echo esc_attr( $default_value ); ?>"
 		placeholder="<?php echo esc_attr( $design['value_label'] ); ?>"

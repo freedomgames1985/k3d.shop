@@ -85,6 +85,23 @@ add_filter( 'woocommerce_cart_item_thumbnail', function ( string $thumbnail_html
 	return '<img src="' . esc_attr( $cart_item['k3d_3dc_snapshot'] ) . '" alt="" class="k3d-3dc-cart-snapshot" style="border-radius:8px;object-fit:cover;" />';
 }, 10, 2 );
 
+/**
+ * أرقام زي "12-345-67" جوه صفحة RTL (السلة، الطلب، الإيميلات) بيقلبها
+ * المتصفح بصريًا - خوارزمية الـbidi بتاعة الأرقام/الشرطات مش محسومة
+ * الاتجاه، فبتاخد اتجاه الصفحة المحيطة (RTL) وترتيب الأرقام يتقلب.
+ * بنعزلها بعلامات اتجاه يونيكود (مش HTML) عشان الحل يفضل شغال في أي
+ * مكان تتعرض فيه القيمة - السلة، الطلب، الإيميل الـHTML والنصي، حتى
+ * لو اتعدّت على فلاتر إزالة أي HTML. القيمة المخزّنة الأصلية (زي
+ * _k3d_3dc_value المستخدمة للإنتاج) بتفضل زي ما هي من غير أي رموز.
+ */
+function k3d_3dc_bidi_safe_value( string $value, array $design ): string {
+	if ( 'digits-dash' !== ( $design['charset'] ?? '' ) ) {
+		return $value;
+	}
+
+	return "\u{2066}" . $value . "\u{2069}";
+}
+
 function k3d_3dc_color_label( string $design_key, string $color_id ): string {
 	$design = k3d_3dc_get_design( $design_key );
 
@@ -107,7 +124,7 @@ add_filter( 'woocommerce_get_item_data', function ( array $item_data, array $car
 
 	$item_data[] = [
 		'key'   => $design['value_label'] ?? __( 'التخصيص', 'k3d-3d-customizer' ),
-		'value' => $cart_item['k3d_3dc_value'],
+		'value' => k3d_3dc_bidi_safe_value( $cart_item['k3d_3dc_value'], $design ?? [] ),
 	];
 
 	if ( ! empty( $cart_item['k3d_3dc_value2'] ) ) {
@@ -136,7 +153,10 @@ add_action( 'woocommerce_checkout_create_order_line_item', function ( WC_Order_I
 	$design_key = k3d_3dc_product_design_key( (int) $values['product_id'] );
 	$design     = k3d_3dc_get_design( $design_key );
 
-	$item->add_meta_data( $design['value_label'] ?? __( 'التخصيص', 'k3d-3d-customizer' ), $values['k3d_3dc_value'] );
+	$item->add_meta_data(
+		$design['value_label'] ?? __( 'التخصيص', 'k3d-3d-customizer' ),
+		k3d_3dc_bidi_safe_value( $values['k3d_3dc_value'], $design ?? [] )
+	);
 
 	// مفاتيح مخفية (بادئة _) ثابتة الاسم بغض النظر عن لغة الموقع - Generation Manager بيقرا منها، مش من العنوان المعروض للعميل.
 	$item->add_meta_data( '_k3d_3dc_value', $values['k3d_3dc_value'] );

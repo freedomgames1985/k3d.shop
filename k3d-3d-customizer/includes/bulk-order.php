@@ -43,6 +43,7 @@ add_action( 'wp_enqueue_scripts', function (): void {
 		'nonce'        => wp_create_nonce( 'k3d_3dc_bulk' ),
 		'productId'    => $product->get_id(),
 		'design'       => k3d_3dc_product_design_key( $product->get_id() ),
+		'isDigits'     => 'digits-dash' === ( k3d_3dc_get_design( k3d_3dc_product_design_key( $product->get_id() ) )['charset'] ?? '' ),
 		'price'        => (float) wc_get_price_to_display( $product ),
 		'currency'     => get_woocommerce_currency_symbol(),
 		'maxItems'     => K3D_3DC_BULK_MAX_ITEMS,
@@ -89,7 +90,7 @@ add_action( 'wp_footer', function (): void {
 				<div class="k3d-3dcb-main">
 					<div class="k3d-3dcb-card">
 						<h3><span class="n">1</span> <?php esc_html_e( 'إضافة القيم', 'k3d-3d-customizer' ); ?></h3>
-						<textarea id="k3d-3dcb-ta" class="k3d-3dcb-ta" placeholder="<?php echo esc_attr( $design['value_label'] . ' — ' . __( 'سطر لكل واحدة', 'k3d-3d-customizer' ) ); ?>"></textarea>
+						<textarea id="k3d-3dcb-ta" class="k3d-3dcb-ta" <?php echo 'digits-dash' === ( $design['charset'] ?? '' ) ? 'dir="ltr"' : ''; ?> placeholder="<?php echo esc_attr( $design['value_label'] . ' — ' . __( 'سطر لكل واحدة', 'k3d-3d-customizer' ) ); ?>"></textarea>
 						<div class="k3d-3dcb-acts">
 							<button type="button" class="k3d-3dcb-btn k3d-3dcb-btn-primary" id="k3d-3dcb-addList">＋ <?php esc_html_e( 'أضف للقائمة', 'k3d-3d-customizer' ); ?></button>
 						</div>

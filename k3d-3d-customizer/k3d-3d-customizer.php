@@ -3,7 +3,7 @@
  * Plugin Name: K3D 3D Customizer
  * Plugin URI: https://k3d.shop
  * Description: معاينة 3D حية (Three.js) لتخصيص المنتجات - سلاسل مفاتيح بالاسم، لوحات/أرقام، وأي تصميم يتضاف لاحقًا. تفعيلها اختياري لكل منتج على حدة، وقابلة للتوسيع بتصاميم جديدة من غير ما تلمس كود الثيم. بتسجّل النص/اللون اللي العميل يختارهم كبيانات حقيقية على الطلب - من غير أي توليد ملفات طباعة تلقائي.
- * Version: 1.7.0
+ * Version: 1.7.1
  * Author: K3D Shop
  * Text Domain: k3d-3d-customizer
  * Requires Plugins: woocommerce
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'K3D_3DC_VERSION', '1.7.0' );
+define( 'K3D_3DC_VERSION', '1.7.1' );
 define( 'K3D_3DC_DIR', plugin_dir_path( __FILE__ ) );
 define( 'K3D_3DC_URL', plugin_dir_url( __FILE__ ) );
 

@@ -84,6 +84,9 @@
 
 				var span = document.createElement( 'span' );
 				span.textContent = item.value;
+				if ( cfg.isDigits ) {
+					span.dir = 'ltr';
+				}
 				row.appendChild( span );
 
 				var btn = document.createElement( 'button' );
@@ -121,6 +124,9 @@
 			var opt = document.createElement( 'option' );
 			opt.value = String( index );
 			opt.textContent = item.value;
+			if ( cfg.isDigits ) {
+				opt.dir = 'ltr';
+			}
 			selEl.appendChild( opt );
 		} );
 
