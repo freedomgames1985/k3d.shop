@@ -142,7 +142,7 @@ add_action( 'wp_footer', function (): void {
 		</div>
 	</div>
 	<?php
-}, 30 );
+}, 5 );
 
 add_action( 'wp_ajax_k3d_3dc_bulk_add', 'k3d_3dc_handle_bulk_add' );
 add_action( 'wp_ajax_nopriv_k3d_3dc_bulk_add', 'k3d_3dc_handle_bulk_add' );

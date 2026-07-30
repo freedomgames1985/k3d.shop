@@ -6,15 +6,22 @@
 ( function () {
 	'use strict';
 
-	var cfg = window.K3D_3DCB_CONFIG || {};
-	var overlay = document.getElementById( 'k3d-3dcb-overlay' );
-	var trigger = document.getElementById( 'k3d-3dcb-trigger' );
+	// السكربت ده بيتحمّل كـclassic script في الفوتر من غير defer، فبيشتغل
+	// فورًا وقت ما المتصفح يوصله وهو لسه بيحلل الصفحة - وقتها الـmodal
+	// (اللي بيتطبع بـwp_footer priority أعلى، يعني بعد السكربت في ترتيب
+	// الصفحة) ممكن يكون لسه مش موجود في الـDOM، فـgetElementById بيرجّع
+	// null والزرار مايتوصلش بأي click listener. بننتظر DOMContentLoaded
+	// عشان نضمن إن كل حاجة اتحطت في الصفحة قبل ما نفتش عنها.
+	function init() {
+		var cfg = window.K3D_3DCB_CONFIG || {};
+		var overlay = document.getElementById( 'k3d-3dcb-overlay' );
+		var trigger = document.getElementById( 'k3d-3dcb-trigger' );
 
-	if ( ! overlay || ! trigger ) {
-		return;
-	}
+		if ( ! overlay || ! trigger ) {
+			return;
+		}
 
-	var closeBtn = document.getElementById( 'k3d-3dcb-close' );
+		var closeBtn = document.getElementById( 'k3d-3dcb-close' );
 	var ta = document.getElementById( 'k3d-3dcb-ta' );
 	var addListBtn = document.getElementById( 'k3d-3dcb-addList' );
 	var rowsEl = document.getElementById( 'k3d-3dcb-rows' );
@@ -301,5 +308,12 @@
 		} );
 	}
 
-	renderAll();
+		renderAll();
+	}
+
+	if ( 'loading' === document.readyState ) {
+		document.addEventListener( 'DOMContentLoaded', init, { once: true } );
+	} else {
+		init();
+	}
 } )();
