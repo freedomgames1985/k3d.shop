@@ -32,6 +32,11 @@ function k3d_home_section_hero_banner(): void {
 	$title = $block['title'] ?? __( 'اسمهم… يتحول لهدية مطبوعة', 'k3d-shop' );
 	$desc  = $block['description'] ?? __( 'اكتب أي اسم وشوفه بيتحول لمجسم ثلاثي الأبعاد أمامك على اللحظة، واطلبه ميدالية أو سلسلة مفاتيح حقيقية خلال أيام.', 'k3d-shop' );
 	$link  = k3d_content_block_link_url( $block );
+
+	$swap_cats = get_terms( [ 'taxonomy' => 'product_cat', 'hide_empty' => true, 'parent' => 0, 'number' => 5 ] );
+	$swap_words = ( ! is_wp_error( $swap_cats ) && ! empty( $swap_cats ) )
+		? wp_list_pluck( $swap_cats, 'name' )
+		: [ __( 'ميدالية', 'k3d-shop' ), __( 'سلسلة مفاتيح', 'k3d-shop' ), __( 'ديكور', 'k3d-shop' ), __( 'هدية شخصية', 'k3d-shop' ) ];
 	?>
 	<section class="hero">
 		<div class="container hero-inner">
@@ -39,9 +44,23 @@ function k3d_home_section_hero_banner(): void {
 				<span class="eyebrow mono">K3D · <?php esc_html_e( 'طباعة تجسيمية بالطلب', 'k3d-shop' ); ?></span>
 				<h1><?php echo esc_html( $title ); ?></h1>
 				<p class="lead"><?php echo esc_html( $desc ); ?></p>
+				<p class="hero-swapline">
+					<?php esc_html_e( 'تكتب اسم — وتشوفه بيتحول لـ', 'k3d-shop' ); ?>
+					<span class="hero-swap" data-k3d-swap>
+						<?php foreach ( $swap_words as $i => $word ) : ?>
+							<span class="<?php echo 0 === $i ? 'is-on' : ''; ?>"><?php echo esc_html( $word ); ?></span>
+						<?php endforeach; ?>
+					</span>
+					<?php esc_html_e( 'قدام عينيك.', 'k3d-shop' ); ?>
+				</p>
 				<div class="hero-ctas">
 					<a href="#how-it-works" class="btn btn-ghost"><?php esc_html_e( 'إزاي بيشتغل؟', 'k3d-shop' ); ?></a>
 					<a href="<?php echo esc_url( $link ?: ( function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'shop' ) : home_url( '/' ) ) ); ?>" class="btn btn-primary"><?php esc_html_e( 'ابدأ التصميم', 'k3d-shop' ); ?></a>
+				</div>
+				<div class="hero-trust">
+					<span>📦 <?php esc_html_e( 'توصيل لكل المناطق', 'k3d-shop' ); ?></span>
+					<span>🎨 <?php esc_html_e( 'تصميم حي في الموقع', 'k3d-shop' ); ?></span>
+					<span>🖨️ <?php esc_html_e( 'طباعة تجسيمية بالطلب', 'k3d-shop' ); ?></span>
 				</div>
 			</div>
 			<?php if ( function_exists( 'k3d_3dc_render_hero' ) ) : ?>
@@ -56,6 +75,31 @@ function k3d_home_section_hero_banner(): void {
 			<?php endif; ?>
 		</div>
 	</section>
+	<?php
+	k3d_render_home_marquee();
+}
+
+/** شريط شعارات متحرك (Marquee) - حقايق تشغيلية حقيقية عن الموقع، مش أرقام مصطنعة. */
+function k3d_render_home_marquee(): void {
+	$items = [
+		__( 'تصميم حي بتقنية 3D', 'k3d-shop' ),
+		__( 'طباعة تجسيمية بالطلب', 'k3d-shop' ),
+		__( 'خامة PLA صديقة للبيئة', 'k3d-shop' ),
+		__( 'تغليف كهدية', 'k3d-shop' ),
+		__( 'توصيل لكل المناطق', 'k3d-shop' ),
+	];
+	?>
+	<div class="home-marquee" aria-hidden="true">
+		<div class="home-marquee-track">
+			<?php for ( $r = 0; $r < 2; $r++ ) : ?>
+				<span>
+					<?php foreach ( $items as $item ) : ?>
+						<?php echo esc_html( $item ); ?> <b>✦</b>
+					<?php endforeach; ?>
+				</span>
+			<?php endfor; ?>
+		</div>
+	</div>
 	<?php
 }
 
@@ -137,9 +181,9 @@ function k3d_home_section_categories(): void {
 			</div>
 		</div>
 		<div class="cat-grid">
-			<?php foreach ( $cats as $cat ) : ?>
+			<?php foreach ( $cats as $i => $cat ) : ?>
 				<?php $thumb_id = get_term_meta( $cat->term_id, 'thumbnail_id', true ); ?>
-				<a class="cat-card" href="<?php echo esc_url( get_term_link( $cat ) ); ?>">
+				<a class="cat-card cat-card--<?php echo esc_attr( (string) ( ( $i % 4 ) + 1 ) ); ?>" href="<?php echo esc_url( get_term_link( $cat ) ); ?>">
 					<div class="icon">
 						<?php if ( $thumb_id ) : ?>
 							<?php echo wp_get_attachment_image( $thumb_id, [ 96, 96 ] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>

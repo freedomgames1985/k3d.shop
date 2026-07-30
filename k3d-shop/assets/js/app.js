@@ -378,4 +378,22 @@
 	}
 
 	document.addEventListener( 'DOMContentLoaded', initScrollReveal );
+
+	// كلمة متغيرة في نص الهيرو (فئات المنتجات الحقيقية) - تتبدل كل شوية.
+	function initHeroSwap() {
+		document.querySelectorAll( '[data-k3d-swap]' ).forEach( function ( el ) {
+			var items = el.querySelectorAll( 'span' );
+			if ( items.length < 2 ) {
+				return;
+			}
+			var index = 0;
+			setInterval( function () {
+				items[ index ].classList.remove( 'is-on' );
+				index = ( index + 1 ) % items.length;
+				items[ index ].classList.add( 'is-on' );
+			}, 2200 );
+		} );
+	}
+
+	document.addEventListener( 'DOMContentLoaded', initHeroSwap );
 } )();

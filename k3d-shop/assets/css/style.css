@@ -305,7 +305,21 @@ html[dir="rtl"] .hero::before{
 .eyebrow::before{ content:""; width:7px;height:7px; border-radius:50%; background:var(--clay-500); display:inline-block; }
 .hero h1{ font-size:clamp(32px,4.6vw,54px); line-height:1.16; margin-bottom:20px; color:var(--paper-050); }
 .hero h1 em{ font-style:normal; color:var(--clay-500); }
-.hero p.lead{ color:var(--paper-200); font-size:16.5px; max-width:46ch; margin-bottom:32px; }
+.hero p.lead{ color:var(--paper-200); font-size:16.5px; max-width:46ch; margin-bottom:18px; }
+.hero-swapline{
+  display:flex; align-items:center; flex-wrap:wrap; gap:.4em;
+  color:var(--paper-100); font-size:14px; margin:0 0 28px;
+}
+.hero-swap{ position:relative; display:inline-block; height:1.5em; min-width:8ch; vertical-align:bottom; overflow:hidden; }
+.hero-swap span{
+  position:absolute; inset-inline-start:0; top:0;
+  color:var(--clay-500); font-weight:700;
+  opacity:0; transform:translateY(8px);
+  transition:opacity .35s ease, transform .35s ease;
+  white-space:nowrap;
+}
+.hero-swap span.is-on{ opacity:1; transform:translateY(0); }
+.hero-trust{ display:flex; gap:18px; flex-wrap:wrap; margin-top:28px; font-size:12.5px; color:var(--paper-200); }
 .hero-ctas{ display:flex; gap:14px; flex-wrap:wrap; }
 .btn{
   display:inline-flex;
@@ -417,6 +431,36 @@ body.k3d-no-animations .hero-inner > *:last-child{ animation:none; opacity:1; tr
 .cat-card-body{ min-width:0; }
 .cat-card h3{ font-size:16px; margin-bottom:4px; }
 .cat-card span{ font-size:12.5px; color:var(--text-muted); font-family:var(--font-mono); }
+.cat-card--1{ background:linear-gradient(135deg, var(--clay-050), #fff); }
+.cat-card--2{ background:linear-gradient(135deg, var(--gold-050), #fff); }
+.cat-card--3{ background:linear-gradient(135deg, #eaf6f4, #fff); }
+.cat-card--4{ background:linear-gradient(135deg, #f3eefb, #fff); }
+.cat-card--1 .icon{ background:var(--clay-050); }
+.cat-card--2 .icon{ background:var(--gold-050); }
+.cat-card--3 .icon{ background:#d8f0ea; }
+.cat-card--4 .icon{ background:#e5d9f5; }
+.cat-card--2 .icon svg{ stroke:var(--gold-500); }
+.cat-card--3 .icon svg{ stroke:#2e8a7a; }
+.cat-card--4 .icon svg{ stroke:#7c5cbf; }
+@media (prefers-color-scheme:dark){
+  .cat-card--1, .cat-card--2, .cat-card--3, .cat-card--4{ background:var(--surface); }
+  .cat-card--1 .icon, .cat-card--2 .icon, .cat-card--3 .icon, .cat-card--4 .icon{ background:rgba(217,88,58,0.16); }
+  .cat-card--2 .icon svg, .cat-card--3 .icon svg, .cat-card--4 .icon svg{ stroke:var(--clay-600); }
+}
+
+/* شريط الحقايق المتحرك تحت الهيرو */
+.home-marquee{ background:var(--ink-900); overflow:hidden; padding:12px 0; }
+.home-marquee-track{ display:flex; width:max-content; animation:k3d-marquee 26s linear infinite; }
+.home-marquee-track span{
+  display:inline-flex; align-items:center; gap:.6em; white-space:nowrap;
+  padding-inline-end:2.5em; font-family:var(--font-mono); font-size:12.5px; color:var(--paper-200);
+}
+.home-marquee-track b{ color:var(--clay-500); font-weight:400; }
+@keyframes k3d-marquee{ from{ transform:translateX(0); } to{ transform:translateX(-50%); } }
+html[dir="rtl"] .home-marquee-track{ animation-name:k3d-marquee-rtl; }
+@keyframes k3d-marquee-rtl{ from{ transform:translateX(0); } to{ transform:translateX(50%); } }
+body.k3d-no-animations .home-marquee-track{ animation:none; }
+@media (prefers-reduced-motion: reduce){ .home-marquee-track{ animation:none; } }
 
 /* process */
 .process{ background:var(--surface); border-top:1px solid var(--line); border-bottom:1px solid var(--line); }
@@ -1331,5 +1375,25 @@ footer.site{ background:var(--ink-900); color:var(--paper-200); margin-top:40px;
   flex-wrap:wrap;
   gap:10px;
 }
+
+/* واتساب عايم - ظاهر في كل صفحات الموقع */
+.wa-fab{
+  position:fixed; bottom:20px; inset-inline-start:20px; z-index:9500;
+  display:flex; align-items:center; gap:9px;
+  background:#25D366; color:#fff; text-decoration:none;
+  padding:11px 16px 11px 13px; border-radius:999px;
+  font-size:14px; font-weight:600;
+  box-shadow:0 8px 22px rgba(37,211,102,0.4);
+  transition:transform .18s ease, box-shadow .18s ease;
+}
+.wa-fab:hover{ transform:translateY(-2px) scale(1.03); box-shadow:0 12px 28px rgba(37,211,102,0.5); color:#fff; }
+.wa-fab-ic{ display:flex; align-items:center; justify-content:center; flex:0 0 auto; animation:k3d-wa-pulse 2.2s ease-in-out infinite; }
+.wa-fab-ic svg{ width:22px; height:22px; }
+@keyframes k3d-wa-pulse{ 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.12); } }
+@media (max-width:640px){
+  .wa-fab{ bottom:14px; inset-inline-start:14px; padding:11px; font-size:0; }
+  .wa-fab-text{ display:none; }
+}
+@media (prefers-reduced-motion: reduce){ .wa-fab-ic{ animation:none; } }
 
 @media (prefers-reduced-motion: reduce){ *{ transition:none !important; } }

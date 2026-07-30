@@ -109,6 +109,17 @@ $links = k3d_app_links();
 	</div>
 </footer>
 
+<?php
+$fab_phone       = k3d_whatsapp_phone();
+$fab_digits_only = ltrim( str_replace( '+', '', $fab_phone ), '0' );
+?>
+<a class="wa-fab" href="https://wa.me/<?php echo esc_attr( $fab_digits_only ); ?>" target="_blank" rel="noopener nofollow" aria-label="<?php esc_attr_e( 'تواصل معنا عبر واتساب', 'k3d-shop' ); ?>">
+	<span class="wa-fab-ic">
+		<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5.1-1.3A10 10 0 1 0 12 2Zm5.6 14.3c-.2.6-1.3 1.2-1.9 1.3-.5.1-1.1.1-1.8-.1-.4-.1-1-.3-1.7-.6-3-1.3-5-4.3-5.1-4.5-.2-.2-1.2-1.6-1.2-3s.7-2.1 1-2.4c.3-.3.6-.4.8-.4h.6c.2 0 .4 0 .6.5.2.6.7 1.9.8 2 .1.2.1.4 0 .6-.1.2-.1.3-.3.5l-.4.5c-.1.2-.3.4-.1.7.2.3.9 1.4 1.8 2.3 1.3 1.2 2.3 1.6 2.6 1.8.3.1.5.1.7-.1.2-.2.7-.8.9-1.1.2-.3.4-.2.6-.1l1.8.9c.2.1.4.2.5.3.1.2.1.9-.1 1.5Z"/></svg>
+	</span>
+	<span class="wa-fab-text"><?php esc_html_e( 'محتاج مساعدة؟ راسلنا', 'k3d-shop' ); ?></span>
+</a>
+
 <?php wp_footer(); ?>
 </body>
 </html>
