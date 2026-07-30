@@ -55,6 +55,17 @@ function k3d_3dc_render_controls_inner( array $design, string $default_value, st
 		placeholder="<?php echo esc_attr( $design['value_label'] ); ?>"
 		autocomplete="off"
 	/>
+	<?php if ( ! empty( $design['secondary'] ) ) : $sec = $design['secondary']; ?>
+		<input
+			type="text"
+			class="k3d-3dc-input-2"
+			<?php echo $field_name ? 'name="k3d_3dc_value2"' : ''; ?>
+			maxlength="<?php echo esc_attr( (string) ( $sec['max_length'] ?? 20 ) ); ?>"
+			value=""
+			placeholder="<?php echo esc_attr( $sec['placeholder'] ?? $sec['label'] ?? '' ); ?>"
+			autocomplete="off"
+		/>
+	<?php endif; ?>
 	<div class="k3d-3dc-colors">
 		<?php foreach ( $design['colors'] as $i => $color ) : ?>
 			<button

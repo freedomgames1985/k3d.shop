@@ -49,12 +49,13 @@
 .k3d-3dc-controls{ margin-top:14px; display:flex; flex-direction:column; gap:12px; }
 .k3d-3dc-input-hint{ margin:0; font-size:11.5px; color:rgba(14,32,36,0.55); text-align:center; }
 .k3d-3dc-warning{ margin:0; font-size:11px; line-height:1.6; color:rgba(14,32,36,0.55); text-align:center; }
-.k3d-3dc-input{
+.k3d-3dc-input, .k3d-3dc-input-2{
   width:100%; border:1.5px solid var(--k3d-3dc-line); border-radius:10px;
   padding:12px 14px; font-size:15px; text-align:center;
   background:#fff; color: var(--k3d-3dc-ink); font-family:inherit;
 }
-.k3d-3dc-input:focus{ outline:none; border-color: var(--k3d-3dc-clay); }
+.k3d-3dc-input-2{ font-size:13.5px; padding:10px 14px; }
+.k3d-3dc-input:focus, .k3d-3dc-input-2:focus{ outline:none; border-color: var(--k3d-3dc-clay); }
 .k3d-3dc-colors{ display:flex; align-items:center; justify-content:center; gap:8px; flex-wrap:wrap; }
 .k3d-3dc-color{
   width:26px;height:26px;border-radius:50%; cursor:pointer;
@@ -106,7 +107,7 @@
 @media (prefers-color-scheme: dark){
   .k3d-3dc-widget, .k3d-3dc-controls-ext{ --k3d-3dc-paper:#132A2F; --k3d-3dc-ink:#F3F5F1; --k3d-3dc-line:rgba(243,245,241,0.16); }
   .k3d-3dc-stage{ background:linear-gradient(180deg,#132A2F,#0E2024); }
-  .k3d-3dc-input{ background:#1E3A40; border-color:rgba(243,245,241,0.18); color:#F3F5F1; }
+  .k3d-3dc-input, .k3d-3dc-input-2{ background:#1E3A40; border-color:rgba(243,245,241,0.18); color:#F3F5F1; }
   .k3d-3dc-badge{ background:rgba(19,42,47,0.85); color:#F3F5F1; }
   .k3d-3dc-refresh, .k3d-3dc-expand{ background:rgba(19,42,47,0.85); color:#F3F5F1; }
   .k3d-3dc-refresh:hover, .k3d-3dc-expand:hover{ background:#132A2F; }

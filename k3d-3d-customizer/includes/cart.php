@@ -62,6 +62,10 @@ add_filter( 'woocommerce_add_cart_item_data', function ( array $cart_item_data, 
 	$cart_item_data['k3d_3dc_value'] = sanitize_text_field( wp_unslash( $_POST['k3d_3dc_value'] ) );
 	$cart_item_data['k3d_3dc_color'] = isset( $_POST['k3d_3dc_color'] ) ? sanitize_key( wp_unslash( $_POST['k3d_3dc_color'] ) ) : '';
 
+	if ( ! empty( $_POST['k3d_3dc_value2'] ) ) {
+		$cart_item_data['k3d_3dc_value2'] = sanitize_text_field( wp_unslash( $_POST['k3d_3dc_value2'] ) );
+	}
+
 	if ( ! empty( $_POST['k3d_3dc_snapshot'] ) ) {
 		$cart_item_data['k3d_3dc_snapshot'] = k3d_3dc_sanitize_snapshot( wp_unslash( $_POST['k3d_3dc_snapshot'] ) );
 	}
@@ -106,6 +110,13 @@ add_filter( 'woocommerce_get_item_data', function ( array $item_data, array $car
 		'value' => $cart_item['k3d_3dc_value'],
 	];
 
+	if ( ! empty( $cart_item['k3d_3dc_value2'] ) ) {
+		$item_data[] = [
+			'key'   => $design['secondary']['label'] ?? __( 'نص إضافي', 'k3d-3d-customizer' ),
+			'value' => $cart_item['k3d_3dc_value2'],
+		];
+	}
+
 	if ( ! empty( $cart_item['k3d_3dc_color'] ) ) {
 		$label = k3d_3dc_color_label( $design_key, $cart_item['k3d_3dc_color'] );
 
@@ -130,6 +141,11 @@ add_action( 'woocommerce_checkout_create_order_line_item', function ( WC_Order_I
 	// مفاتيح مخفية (بادئة _) ثابتة الاسم بغض النظر عن لغة الموقع - Generation Manager بيقرا منها، مش من العنوان المعروض للعميل.
 	$item->add_meta_data( '_k3d_3dc_value', $values['k3d_3dc_value'] );
 	$item->add_meta_data( '_k3d_3dc_color', $values['k3d_3dc_color'] ?? '' );
+
+	if ( ! empty( $values['k3d_3dc_value2'] ) ) {
+		$item->add_meta_data( $design['secondary']['label'] ?? __( 'نص إضافي', 'k3d-3d-customizer' ), $values['k3d_3dc_value2'] );
+		$item->add_meta_data( '_k3d_3dc_value2', $values['k3d_3dc_value2'] );
+	}
 
 	if ( ! empty( $values['k3d_3dc_snapshot'] ) ) {
 		// مخفي (بادئة _) عشان الـbase64 الطويل ميظهرش كنص جوه تفاصيل الطلب/الإيميل - بيتعرض كصورة بدل كده تحت.

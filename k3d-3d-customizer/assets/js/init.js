@@ -78,7 +78,17 @@ async function boot() {
 			import( /* webpackIgnore: true */ cfg.moduleBaseUrl + 'designs/name.js' ),
 			import( /* webpackIgnore: true */ cfg.moduleBaseUrl + 'designs/plate.js' ),
 			import( /* webpackIgnore: true */ cfg.moduleBaseUrl + 'designs/name-layers.js' ),
+			import( /* webpackIgnore: true */ cfg.moduleBaseUrl + 'designs/car-plate.js' ),
 		] );
+
+		// تصاميم مخصّصة مرفوعة من لوحة التحكم - كل واحد بيتحمّل لوحده، عشان
+		// لو واحد فيهم فيه عطل (اترفع ملف مش سليم) ميوقفش باقي التصاميم
+		// المدمجة/المخصّصة التانية.
+		if ( Array.isArray( cfg.customDesignUrls ) ) {
+			await Promise.all( cfg.customDesignUrls.map( ( url ) => import( /* webpackIgnore: true */ url ).catch( ( err ) => {
+				console.error( '[k3d-3dc] فشل تحميل تصميم مخصّص:', url, err );
+			} ) ) );
+		}
 	} catch ( e ) {
 		// المعاينة تفاعلية إضافية مش أساسية - لو فشل التحميل (شبكة/CDN)، الفورم العادي يفضل شغال بدونها.
 		// بنسجّل السبب في الكونسول عشان نقدر نشخّص أي عطل مستقبلي بدل ما يختفي بصمت.
@@ -118,6 +128,9 @@ function initWidget( el, engine ) {
 	const canvas = el.querySelector( '.k3d-3dc-canvas' );
 	const loading = el.querySelector( '.k3d-3dc-loading' );
 	const input = controlsRoot.querySelector( '.k3d-3dc-input' );
+	// حقل ثاني اختياري (اسم/نص إضافي) - أي تصميم بيعرّف design.secondary
+	// في PHP بيظهر له تلقائيًا، من غير ما init.js يعرف اسم التصميم نفسه.
+	const input2 = controlsRoot.querySelector( '.k3d-3dc-input-2' );
 	const colorButtons = Array.prototype.slice.call( controlsRoot.querySelectorAll( '.k3d-3dc-color' ) );
 	const colorField = controlsRoot.querySelector( '.k3d-3dc-color-field' );
 	const snapshotField = controlsRoot.querySelector( '.k3d-3dc-snapshot-field' );
@@ -138,6 +151,7 @@ function initWidget( el, engine ) {
 		controls: stage.controls,
 		value: input ? input.value : designDef.default_value,
 		colorHex: currentColorHex,
+		value2: input2 ? input2.value : '',
 	} );
 
 	function resize() {
@@ -159,29 +173,45 @@ function initWidget( el, engine ) {
 	el.classList.add( 'is-ready' );
 
 	let debounceTimer = null;
+	function scheduleUpdate() {
+		clearTimeout( debounceTimer );
+		debounceTimer = setTimeout( () => {
+			instance.update( input ? input.value : '', currentColorHex, input2 ? input2.value : '' );
+		}, 120 );
+	}
 	if ( input ) {
-		input.addEventListener( 'input', () => {
-			clearTimeout( debounceTimer );
-			debounceTimer = setTimeout( () => {
-				instance.update( input.value, currentColorHex );
-			}, 120 );
-		} );
+		input.addEventListener( 'input', scheduleUpdate );
+	}
+	if ( input2 ) {
+		input2.addEventListener( 'input', scheduleUpdate );
 	}
 
-	// صفحة المنتج: أول ما العميل يبدأ يكتب، صورة المنتج نفسها (المعرض)
-	// بتتحول للمعاينة الحية بدل ما تبقى بلوك منفصل تحت - بالظبط زي أي
-	// متجر تخصيص حقيقي. قبل ما يكتب، صور المنتج العادية فاضلة زي ما هي.
+	// صفحة المنتج: أول ما العميل يبدأ يكتب (في أي حقل من حقول التخصيص)،
+	// صورة المنتج نفسها (المعرض) بتتحول للمعاينة الحية بدل ما تبقى بلوك
+	// منفصل تحت - بالظبط زي أي متجر تخصيص حقيقي. قبل ما يكتب، صور
+	// المنتج العادية فاضلة زي ما هي.
 	const galleryRoot = el.closest( '.product-gallery' );
-	if ( galleryRoot && input ) {
+	if ( galleryRoot && ( input || input2 ) ) {
 		const revealGallery = function () {
-			if ( '' === input.value.trim() ) {
+			const hasValue = ( input && input.value.trim() !== '' ) || ( input2 && input2.value.trim() !== '' );
+			if ( ! hasValue ) {
 				return;
 			}
 			galleryRoot.classList.add( 'k3d-3dc-gallery-active' );
 			resize();
-			input.removeEventListener( 'input', revealGallery );
+			if ( input ) {
+				input.removeEventListener( 'input', revealGallery );
+			}
+			if ( input2 ) {
+				input2.removeEventListener( 'input', revealGallery );
+			}
 		};
-		input.addEventListener( 'input', revealGallery );
+		if ( input ) {
+			input.addEventListener( 'input', revealGallery );
+		}
+		if ( input2 ) {
+			input2.addEventListener( 'input', revealGallery );
+		}
 	}
 
 	// لقطة من المعاينة (الشكل بالظبط اللي العميل صممه) بتتاخد لحظة "أضف
@@ -208,7 +238,7 @@ function initWidget( el, engine ) {
 				colorField.value = btn.dataset.colorId || '';
 			}
 
-			instance.update( input ? input.value : '', currentColorHex );
+			instance.update( input ? input.value : '', currentColorHex, input2 ? input2.value : '' );
 		} );
 	} );
 

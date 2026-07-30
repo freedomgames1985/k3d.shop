@@ -45,11 +45,14 @@ add_action( 'wp_enqueue_scripts', function (): void {
 		true
 	);
 
-	wp_localize_script( 'k3d-3dc-init', 'K3D_3DC_CONFIG', [
+	$config = [
 		'threeUrl'         => 'https://cdn.jsdelivr.net/npm/three@' . K3D_3DC_THREE_VERSION . '/build/three.module.js',
 		'orbitControlsUrl' => 'https://cdn.jsdelivr.net/npm/three@' . K3D_3DC_THREE_VERSION . '/examples/jsm/controls/OrbitControls.js',
 		'moduleBaseUrl'    => K3D_3DC_URL . 'assets/js/',
 		'designs'          => k3d_3dc_get_designs(),
+		// تصاميم مخصّصة مرفوعة من الأدمن (custom-designs.php) - روابط JS
+		// إضافية يتم تحميلها ديناميكيًا زي التصاميم المدمجة بالظبط.
+		'customDesignUrls' => [],
 		'i18n'             => [
 			'rotateHint'     => __( 'اسحب للتدوير · عجلة الماوس للتكبير', 'k3d-3d-customizer' ),
 			'liveBadge'      => __( 'معاينة حية', 'k3d-3d-customizer' ),
@@ -57,7 +60,9 @@ add_action( 'wp_enqueue_scripts', function (): void {
 			'colorLabel'     => __( 'اللون', 'k3d-3d-customizer' ),
 			'previewFailed'  => __( 'تعذّر تحميل المعاينة الحية 3D. تقدر تكمل بياناتك والطلب عادي.', 'k3d-3d-customizer' ),
 		],
-	] );
+	];
+
+	wp_localize_script( 'k3d-3dc-init', 'K3D_3DC_CONFIG', apply_filters( 'k3d_3dc_config', $config ) );
 } );
 
 /**

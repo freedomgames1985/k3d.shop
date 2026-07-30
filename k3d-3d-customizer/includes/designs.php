@@ -80,6 +80,29 @@ function k3d_3dc_get_designs(): array {
 				[ 'id' => 'red', 'hex' => '#C0392B', 'label' => __( 'شرطة (أحمر)', 'k3d-3d-customizer' ) ],
 			],
 		],
+		'car_plate' => [
+			'label'         => __( 'لوحة سيارة إسرائيلية (إطار + شريط IL + رقم بارز)', 'k3d-3d-customizer' ),
+			'description'   => __( 'تقليد حقيقي للوحة سيارة إسرائيلية - إطار غامق، شريط "IL" أزرق، ثقب تعليق حقيقي، والرقم منقوش بارز. فيه خانة اسم/نص إضافي اختيارية تحت الرقم.', 'k3d-3d-customizer' ),
+			'js_module'     => 'car_plate',
+			'default_value' => '123-45-678',
+			'value_label'   => __( 'رقم اللوحة', 'k3d-3d-customizer' ),
+			'max_length'    => 10,
+			'charset'       => 'digits-dash',
+			'colors'        => [
+				[ 'id' => 'yellow', 'hex' => '#F5C518', 'label' => __( 'رجالة (أصفر)', 'k3d-3d-customizer' ) ],
+				[ 'id' => 'white', 'hex' => '#F3F5F1', 'label' => __( 'خصوصي (أبيض)', 'k3d-3d-customizer' ) ],
+				[ 'id' => 'black', 'hex' => '#16211f', 'label' => __( 'عسكري (أسود)', 'k3d-3d-customizer' ) ],
+				[ 'id' => 'red', 'hex' => '#C0392B', 'label' => __( 'شرطة (أحمر)', 'k3d-3d-customizer' ) ],
+			],
+			// خانة تانية اختيارية - أي تصميم يقدر يضيفها بنفس الطريقة عشان
+			// يظهر له حقل إدخال تاني تلقائيًا (init.js وproduct-render.php
+			// بيقروا المفتاح ده من غير ما يعرفوا حاجة عن car_plate تحديدًا).
+			'secondary'     => [
+				'label'       => __( 'اسم أو نص إضافي (اختياري)', 'k3d-3d-customizer' ),
+				'placeholder' => __( 'اسم إضافي تحت الرقم...', 'k3d-3d-customizer' ),
+				'max_length'  => 16,
+			],
+		],
 	] );
 
 	return $designs;
