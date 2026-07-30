@@ -37,7 +37,15 @@ async function boot() {
 		] );
 	} catch ( e ) {
 		// المعاينة تفاعلية إضافية مش أساسية - لو فشل التحميل (شبكة/CDN)، الفورم العادي يفضل شغال بدونها.
-		widgets.forEach( ( el ) => el.classList.add( 'k3d-3dc-failed' ) );
+		// بنسجّل السبب في الكونسول عشان نقدر نشخّص أي عطل مستقبلي بدل ما يختفي بصمت.
+		console.error( '[k3d-3dc] فشل تحميل محرك المعاينة 3D:', e );
+		widgets.forEach( ( el ) => {
+			el.classList.add( 'k3d-3dc-failed' );
+			const loading = el.querySelector( '.k3d-3dc-loading' );
+			if ( loading && cfg.i18n && cfg.i18n.previewFailed ) {
+				loading.textContent = cfg.i18n.previewFailed;
+			}
+		} );
 		return;
 	}
 

@@ -64,7 +64,11 @@
 }
 .k3d-3dc-color.is-active{ box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--k3d-3dc-clay); }
 
-.k3d-3dc-widget.k3d-3dc-failed{ display:none; }
+/* لو المعاينة 3D فشلت تحمّل (شبكة/CDN/إضافة حظر) بنسيب الفورم (الاسم
+واللون) شغال وقابل للطلب - مش منطقي نخبي الودجت كله بسبب الكانفاس بس. */
+.k3d-3dc-widget.k3d-3dc-failed .k3d-3dc-badge,
+.k3d-3dc-widget.k3d-3dc-failed .k3d-3dc-stage-actions,
+.k3d-3dc-widget.k3d-3dc-failed .k3d-3dc-hint{ display:none; }
 
 .k3d-3dc-specs{ margin-top:16px; max-width:420px; }
 .k3d-3dc-specs h4{ margin:0 0 8px; font-size:12.5px; font-weight:700; color:var(--k3d-3dc-ink); }
