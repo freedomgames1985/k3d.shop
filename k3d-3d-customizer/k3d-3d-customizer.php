@@ -3,7 +3,7 @@
  * Plugin Name: K3D 3D Customizer
  * Plugin URI: https://k3d.shop
  * Description: معاينة 3D حية (Three.js) لتخصيص المنتجات - سلاسل مفاتيح بالاسم، لوحات/أرقام، وأي تصميم يتضاف لاحقًا. تفعيلها اختياري لكل منتج على حدة، وقابلة للتوسيع بتصاميم جديدة من غير ما تلمس كود الثيم.
- * Version: 1.1.0
+ * Version: 1.2.0
  * Author: K3D Shop
  * Text Domain: k3d-3d-customizer
  * Requires Plugins: woocommerce
@@ -15,9 +15,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'K3D_3DC_VERSION', '1.1.0' );
+define( 'K3D_3DC_VERSION', '1.2.0' );
 define( 'K3D_3DC_DIR', plugin_dir_path( __FILE__ ) );
 define( 'K3D_3DC_URL', plugin_dir_url( __FILE__ ) );
+
+// نأكد ووكومرس إن الإضافة متوافقة مع جدول الطلبات الجديد (HPOS) - غير كده بتظهر تحذيرات مش لازمة في صفحة الإضافات.
+add_action( 'before_woocommerce_init', function (): void {
+	if ( class_exists( \Automattic\WooCommerce\Utilities\FeaturesUtil::class ) ) {
+		\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'custom_order_tables', __FILE__, true );
+	}
+} );
 
 /**
  * سجل التصاميم قابل للتوسيع - أي تصميم جديد (مستقبلًا) بيتسجل عن طريق
@@ -41,6 +48,7 @@ require K3D_3DC_DIR . 'includes/admin-menu.php';
 require K3D_3DC_DIR . 'includes/generation/adapter-interface.php';
 require K3D_3DC_DIR . 'includes/generation/openscad-adapter.php';
 require K3D_3DC_DIR . 'includes/generation/manager.php';
+require K3D_3DC_DIR . 'includes/manual-upload.php';
 
 add_action( 'admin_notices', function (): void {
 	if ( class_exists( 'WooCommerce' ) || ! current_user_can( 'activate_plugins' ) ) {
