@@ -156,6 +156,11 @@ function initWidget( el, engine ) {
  * نحمّلهم فورًا مع كل تحميل صفحة حتى لو الزائر مش هيلمس الودجت خالص -
  * أول تفاعل حقيقي في الصفحة (لمس/كتابة/فوكس) أو مهلة قصيرة لو مفيش
  * تفاعل، أيهما أسرع.
+ *
+ * الاستثناء: ودجت الـ"hero" في الصفحة الرئيسية هو المحتوى الأساسي للقسم
+ * (مش محتوى مساعد زي معاينة صفحة المنتج)، فبيتحمّل فورًا مع الصفحة -
+ * التأجيل هنا كان بيخلي القسم يفضل شايل "جاري تجهيز المعاينة..." لثواني
+ * وكأن الودجت ظهر واختفى.
  */
 function whenDomReady( fn ) {
 	if ( document.readyState === 'loading' ) {
@@ -173,6 +178,12 @@ function start() {
 	started = true;
 	whenDomReady( boot );
 }
+
+whenDomReady( function () {
+	if ( document.querySelector( '.k3d-3dc-mode-hero[data-k3d-3dc]' ) ) {
+		start();
+	}
+} );
 
 [ 'pointerdown', 'touchstart', 'focusin', 'keydown' ].forEach( ( ev ) => {
 	document.addEventListener( ev, start, { once: true, passive: true, capture: true } );
