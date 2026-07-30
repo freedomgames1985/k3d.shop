@@ -41,8 +41,12 @@ add_action( 'wp_enqueue_scripts', function (): void {
 		$theme_version
 	);
 
+	// اسم مختلف عن "k3d-shop-style" اللي إضافة k3d-shop.php القديمة بتستخدمه
+	// لنفس الاسم لملف CSS مختلف تمامًا - لو الاتنين شغالين سوا، ووردبريس
+	// بيسيب أول تسجيل بس ويتجاهل أي تسجيل تاني بنفس الـhandle، فستايل
+	// الثيم الحقيقي كان مش بيتحمّل خالص على صفحات الووكومرس في السيناريو ده.
 	wp_enqueue_style(
-		'k3d-shop-style',
+		'k3d-shop-theme-style',
 		get_template_directory_uri() . '/assets/css/style.css',
 		[ 'k3d-fonts' ],
 		$theme_version

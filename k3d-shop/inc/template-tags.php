@@ -140,7 +140,11 @@ function k3d_product_card( WC_Product $product ): void {
 					sprintf(
 						'<a href="%s" data-quantity="1" class="prod-add %s" %s aria-label="%s"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg></a>',
 						esc_url( $product->add_to_cart_url() ),
-						esc_attr( implode( ' ', array_filter( [ 'ajax_add_to_cart', $product->is_purchasable() && $product->is_in_stock() ? '' : 'disabled' ] ) ) ),
+						// "add_to_cart_button" لازم يفضل موجود - جافاسكربت ووكومرس
+						// نفسها (add-to-cart.js) بتربط حدث الـAJAX على السيلكتور ده
+						// بالظبط؛ من غيره الزرار بيرجع لتنقل الصفحة العادي
+						// (?add-to-cart=ID) بدل تحديث السلة بـAJAX.
+						esc_attr( implode( ' ', array_filter( [ 'add_to_cart_button', 'ajax_add_to_cart', $product->is_purchasable() && $product->is_in_stock() ? '' : 'disabled' ] ) ) ),
 						'data-product_id="' . esc_attr( $product->get_id() ) . '"',
 						esc_attr__( 'أضف للسلة', 'k3d-shop' )
 					),
