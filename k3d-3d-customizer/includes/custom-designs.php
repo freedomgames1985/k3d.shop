@@ -6,10 +6,12 @@
  * الإضافة نفسه. أي تصميم يتضاف من هنا بيظهر أوتوماتيك في قائمة "نوع
  * التصميم" في كل منتج، بالظبط زي التصاميم الجاهزة.
  *
- * تنبيه أمان: رفع تصميم بيتطلب صلاحية manage_woocommerce (نفس صلاحية
- * إدارة الووكومرس والإضافات) - الملف اللي بيترفع بيشتغل كـJavaScript
- * حقيقي في متصفح كل زائر للموقع، فده لازم يفضل مقصور على أدمن موثوق
- * بيه، بالظبط زي محرر ملفات الثيم/الإضافات المدمج في ووردبريس.
+ * تنبيه أمان: رفع تصميم بيتطلب صلاحية manage_options (صلاحية "أدمن
+ * الموقع" الأساسية، أضمن من manage_woocommerce اللي بتتحط بواسطة
+ * ووكومرس نفسها وممكن تتعطل لو حصل أي خلل في جدول الأدوار) - الملف
+ * اللي بيترفع بيشتغل كـJavaScript حقيقي في متصفح كل زائر للموقع، فده
+ * لازم يفضل مقصور على أدمن موثوق بيه، بالظبط زي محرر ملفات الثيم/
+ * الإضافات المدمج في ووردبريس.
  *
  * @package K3D_3D_Customizer
  */
@@ -89,7 +91,7 @@ add_action( 'admin_menu', function (): void {
 		'k3d-3dc',
 		__( 'تصاميم مخصّصة', 'k3d-3d-customizer' ),
 		__( 'تصاميم مخصّصة', 'k3d-3d-customizer' ),
-		'manage_woocommerce',
+		'manage_options',
 		'k3d-3dc-custom-designs',
 		'k3d_3dc_render_custom_designs_page'
 	);
@@ -127,7 +129,7 @@ JS;
 }
 
 function k3d_3dc_render_custom_designs_page(): void {
-	if ( ! current_user_can( 'manage_woocommerce' ) ) {
+	if ( ! current_user_can( 'manage_options' ) ) {
 		return;
 	}
 

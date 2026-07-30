@@ -10,11 +10,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+// manage_options (مش manage_woocommerce) عشان دي الصلاحية اللي مضمونة
+// لأي أدمن حقيقي في الموقع - manage_woocommerce بتتحط لدور "مدير
+// المتجر" عن طريق ووكومرس نفسها وقت التفعيل، ولو حصل أي خلل في جدول
+// الأدوار (تعطيل/تفعيل ووكومرس، إضافة تانية عدّلت الأدوار...) ممكن
+// حتى حساب الأدمن الأساسي يفضل من غيرها ويشوف "غير مسموح لك الوصول".
 add_action( 'admin_menu', function (): void {
 	add_menu_page(
 		__( 'K3D 3D Customizer', 'k3d-3d-customizer' ),
 		__( 'K3D 3D Customizer', 'k3d-3d-customizer' ),
-		'manage_woocommerce',
+		'manage_options',
 		'k3d-3dc',
 		'k3d_3dc_render_admin_page',
 		'dashicons-media-interactive',
@@ -23,7 +28,7 @@ add_action( 'admin_menu', function (): void {
 } );
 
 function k3d_3dc_render_admin_page(): void {
-	if ( ! current_user_can( 'manage_woocommerce' ) ) {
+	if ( ! current_user_can( 'manage_options' ) ) {
 		return;
 	}
 
