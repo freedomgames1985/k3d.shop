@@ -1,7 +1,8 @@
 /**
  * تصميم "لوحة/رقم" - لوحة معدنية مجسمة (extrude حقيقي) + حلقة مفتاح،
  * والرقم منقوش عليها بخط لاتيني/أرقام (TextGeometry) - الأرقام مالهاش
- * مشكلة تشكيل حروف زي العربي، فمعاينة 3D حقيقية بالكامل هنا.
+ * مشكلة تشكيل حروف زي العربي، فمعاينة 3D حقيقية بالكامل هنا. الشريط
+ * الأزرق بـ"IL" على الطرف تقليد لشكل لوحة السيارة الإسرائيلية الحقيقية.
  */
 
 import { registerDesign } from '../customizer.js';
@@ -71,6 +72,48 @@ registerDesign( 'plate', function ( { THREE, scene, value, colorHex } ) {
 	ring.position.set( -1.95, 0.5, 0 );
 	group.add( ring );
 
+	// شريط "IL" الأزرق - نفس مكانه على أي لوحة سيارة إسرائيلية حقيقية،
+	// ثابت (مش بيتغير مع النص/اللون)، فبيتبني مرة واحدة بس.
+	const chipWidth = 0.55;
+	const chipHeight = 0.85;
+	const chipCenterX = -1.4;
+	const chipShape = roundedRectShape( THREE, chipWidth, chipHeight, 0.06 );
+	const chipGeometry = new THREE.ExtrudeGeometry( chipShape, {
+		depth: 0.05,
+		bevelEnabled: false,
+	} );
+	const chipMaterial = new THREE.MeshStandardMaterial( { color: '#0057B8', roughness: 0.35, metalness: 0.1 } );
+	const chipMesh = new THREE.Mesh( chipGeometry, chipMaterial );
+	chipMesh.position.set( chipCenterX, 0, -0.02 );
+	group.add( chipMesh );
+
+	let chipLabelMesh = null;
+	let chipLabelMaterial = null;
+	const textOffsetX = 0.35;
+
+	function buildChipLabel() {
+		if ( ! fontCache || chipLabelMesh ) {
+			return;
+		}
+
+		loadTextGeometry().then( ( { TextGeometry } ) => {
+			const geometry = new TextGeometry( 'IL', {
+				font: fontCache,
+				size: 0.2,
+				height: 0.05,
+				curveSegments: 4,
+				bevelEnabled: false,
+			} );
+			geometry.computeBoundingBox();
+			geometry.center();
+
+			chipLabelMaterial = new THREE.MeshStandardMaterial( { color: '#F3F5F1', roughness: 0.4, metalness: 0.05 } );
+			chipLabelMesh = new THREE.Mesh( geometry, chipLabelMaterial );
+			chipLabelMesh.position.set( chipCenterX, 0, 0.035 );
+			group.add( chipLabelMesh );
+		} );
+	}
+
 	let textMesh = null;
 	let textMaterial = null;
 
@@ -87,7 +130,7 @@ registerDesign( 'plate', function ( { THREE, scene, value, colorHex } ) {
 
 			const geometry = new TextGeometry( ( text || '' ).toString() || ' ', {
 				font: fontCache,
-				size: 0.46,
+				size: 0.4,
 				height: 0.12,
 				curveSegments: 6,
 				bevelEnabled: false,
@@ -100,12 +143,15 @@ registerDesign( 'plate', function ( { THREE, scene, value, colorHex } ) {
 			}
 
 			textMesh = new THREE.Mesh( geometry, textMaterial );
-			textMesh.position.z = 0.05;
+			textMesh.position.set( textOffsetX, 0, 0.05 );
 			group.add( textMesh );
 		} );
 	}
 
-	loadFont().then( () => rebuildText( value ) );
+	loadFont().then( () => {
+		rebuildText( value );
+		buildChipLabel();
+	} );
 
 	return {
 		object3D: group,
@@ -123,6 +169,14 @@ registerDesign( 'plate', function ( { THREE, scene, value, colorHex } ) {
 			plateMaterial.dispose();
 			ringMaterial.dispose();
 			ring.geometry.dispose();
+			chipGeometry.dispose();
+			chipMaterial.dispose();
+			if ( chipLabelMesh ) {
+				chipLabelMesh.geometry.dispose();
+			}
+			if ( chipLabelMaterial ) {
+				chipLabelMaterial.dispose();
+			}
 			if ( textMesh ) {
 				textMesh.geometry.dispose();
 			}

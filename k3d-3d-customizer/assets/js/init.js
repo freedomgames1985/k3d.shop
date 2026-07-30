@@ -34,6 +34,7 @@ async function boot() {
 		await Promise.all( [
 			import( /* webpackIgnore: true */ cfg.moduleBaseUrl + 'designs/name.js' ),
 			import( /* webpackIgnore: true */ cfg.moduleBaseUrl + 'designs/plate.js' ),
+			import( /* webpackIgnore: true */ cfg.moduleBaseUrl + 'designs/name-layers.js' ),
 		] );
 	} catch ( e ) {
 		// المعاينة تفاعلية إضافية مش أساسية - لو فشل التحميل (شبكة/CDN)، الفورم العادي يفضل شغال بدونها.

@@ -48,6 +48,23 @@ function k3d_3dc_get_designs(): array {
 				[ 'id' => 'purple', 'hex' => '#7C5CBF', 'label' => __( 'بنفسجي', 'k3d-3d-customizer' ) ],
 			],
 		],
+		'name_layers' => [
+			'label'         => __( 'اسم بثلاث طبقات ملونة (زي القص متعدد الألوان)', 'k3d-3d-customizer' ),
+			'description'   => __( 'العميل بيكتب اسمه وبيتحول لمجسم بحد ملوّن حوالين الحروف - تأثير الطبقات الملونة زي القطع الحقيقية.', 'k3d-3d-customizer' ),
+			'js_module'     => 'name_layers',
+			'default_value' => __( 'اسمك هنا', 'k3d-3d-customizer' ),
+			'value_label'   => __( 'الاسم أو النص', 'k3d-3d-customizer' ),
+			'max_length'    => 14,
+			'charset'       => 'text',
+			'colors'        => [
+				[ 'id' => 'blue', 'hex' => '#38B3FF', 'label' => __( 'تركواز', 'k3d-3d-customizer' ) ],
+				[ 'id' => 'clay', 'hex' => '#D9583A', 'label' => __( 'طوبي', 'k3d-3d-customizer' ) ],
+				[ 'id' => 'gold', 'hex' => '#B8862F', 'label' => __( 'ذهبي', 'k3d-3d-customizer' ) ],
+				[ 'id' => 'rose', 'hex' => '#E07A9E', 'label' => __( 'وردي', 'k3d-3d-customizer' ) ],
+				[ 'id' => 'green', 'hex' => '#2E8434', 'label' => __( 'أخضر', 'k3d-3d-customizer' ) ],
+				[ 'id' => 'purple', 'hex' => '#7C5CBF', 'label' => __( 'بنفسجي', 'k3d-3d-customizer' ) ],
+			],
+		],
 		'plate' => [
 			'label'         => __( 'لوحة/رقم (أرقام فقط - ميدالية سيارة أو رقم هاتف)', 'k3d-3d-customizer' ),
 			'description'   => __( 'العميل بيدخل رقم (لوحة سيارة أو تليفون) وبيتحول للوحة 3D مجسمة.', 'k3d-3d-customizer' ),
