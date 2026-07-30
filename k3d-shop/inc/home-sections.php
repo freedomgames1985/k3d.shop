@@ -22,17 +22,16 @@ function k3d_render_home_section( string $key ): void {
 
 /**
  * البانر الرئيسي (Hero) - من مجموعة home_primary، أو نص افتراضي لو لسه ملوش
- * محتوى. جنب النص: السلايدر (مجموعة slider) لو فيه عناصر، وإلا صورة
- * البانر الرئيسي المفردة، وإلا الشكل الزخرفي الافتراضي (ميدالية).
+ * محتوى. جنب النص: معاينة 3D حية تفاعلية (بلجن k3d-3d-customizer) بتحول
+ * أي اسم يتكتب لمجسم فوري - أو الشكل الزخرفي الافتراضي (ميدالية) لو
+ * البلجن مش مفعّل.
  */
 function k3d_home_section_hero_banner(): void {
 	$block = k3d_first_content_block( 'home_primary' );
 
-	$title        = $block['title'] ?? __( 'قصّتك… مطبوعة بأدق التفاصيل', 'k3d-shop' );
-	$desc         = $block['description'] ?? __( 'ميداليات وهدايا وديكورات بتصميم خاص بيك — من فكرة على الشاشة، لقطعة حقيقية بين إيديك خلال أيام.', 'k3d-shop' );
-	$image        = $block['image_url'] ?? '';
-	$link         = k3d_content_block_link_url( $block );
-	$slider_items = k3d_content_blocks( 'slider' );
+	$title = $block['title'] ?? __( 'اسمهم… يتحول لهدية مطبوعة', 'k3d-shop' );
+	$desc  = $block['description'] ?? __( 'اكتب أي اسم وشوفه بيتحول لمجسم ثلاثي الأبعاد أمامك على اللحظة، واطلبه ميدالية أو سلسلة مفاتيح حقيقية خلال أيام.', 'k3d-shop' );
+	$link  = k3d_content_block_link_url( $block );
 	?>
 	<section class="hero">
 		<div class="container hero-inner">
@@ -41,15 +40,12 @@ function k3d_home_section_hero_banner(): void {
 				<h1><?php echo esc_html( $title ); ?></h1>
 				<p class="lead"><?php echo esc_html( $desc ); ?></p>
 				<div class="hero-ctas">
-					<a href="<?php echo esc_url( $link ?: ( function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'shop' ) : home_url( '/' ) ) ); ?>" class="btn btn-primary"><?php esc_html_e( 'تصفح المنتجات', 'k3d-shop' ); ?></a>
+					<a href="#how-it-works" class="btn btn-ghost"><?php esc_html_e( 'إزاي بيشتغل؟', 'k3d-shop' ); ?></a>
+					<a href="<?php echo esc_url( $link ?: ( function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'shop' ) : home_url( '/' ) ) ); ?>" class="btn btn-primary"><?php esc_html_e( 'ابدأ التصميم', 'k3d-shop' ); ?></a>
 				</div>
 			</div>
-			<?php if ( $slider_items ) : ?>
-				<?php k3d_render_slider_markup( $slider_items, 'hero-slider' ); ?>
-			<?php elseif ( $image ) : ?>
-				<div class="medal-wrap">
-					<img src="<?php echo esc_url( $image ); ?>" alt="<?php echo esc_attr( $title ); ?>" style="max-width:100%;border-radius:20px;position:relative;z-index:1;">
-				</div>
+			<?php if ( function_exists( 'k3d_3dc_render_hero' ) ) : ?>
+				<?php k3d_3dc_render_hero( [ 'default' => __( 'اسمك هنا', 'k3d-shop' ) ] ); ?>
 			<?php else : ?>
 				<div class="medal-wrap">
 					<div class="medal-ring r1"></div>
@@ -106,7 +102,7 @@ function k3d_render_how_it_works(): void {
 		[ 'title' => __( 'نوصلك للباب', 'k3d-shop' ), 'desc' => __( 'تغليف وتوصيل لكل المناطق خلال 3-5 أيام.', 'k3d-shop' ) ],
 	];
 	?>
-	<section class="container how-it-works">
+	<section class="container how-it-works" id="how-it-works">
 		<div class="how-it-works-grid">
 			<?php foreach ( $steps as $i => $step ) : ?>
 				<div class="how-it-works-step">
